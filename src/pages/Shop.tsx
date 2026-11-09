@@ -6,6 +6,7 @@ import { SpriteThumb } from '../art/sprites';
 import { toast } from '../store/toastStore';
 import { sfx } from '../utils/sound';
 import { confirmDialog } from '../components/common/ConfirmDialog';
+import { ModeFrame, TitleBlock, Stamp } from '../components/common/PosterTitle';
 
 const PREVIEW: Record<string, React.ReactNode> = {
   'furn:lantern': <SpriteThumb id="f-lantern" size={52} />,
@@ -41,13 +42,12 @@ export default function Shop() {
   };
 
   return (
-    <div className="mx-auto flex max-w-[1300px] flex-col gap-5 px-3 py-4 md:px-5">
+    <ModeFrame mode="shop" className="mx-auto flex max-w-[1300px] flex-col gap-5 px-3 py-4 md:px-5">
       <header className="flex flex-wrap items-start gap-3">
-        <div className="badge-limited hidden !bg-[#D4A746] sm:block">ショップ</div>
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl text-shadow-soft md:text-3xl">Café Shop</h1>
-          <p className="text-xs text-cocoa md:text-sm">Earn stars by creating — spend them on extra goodies. Everything you need to play is already free ♡</p>
+          <TitleBlock small title="Café Shop" jp="ショップ" subtitle="Earn stars by creating — spend them on extra goodies. Everything you need to play is already free ♡" />
         </div>
+        <Stamp mode="shop" />
       </header>
 
       <section className="grid gap-3 sm:grid-cols-3">
@@ -103,6 +103,6 @@ export default function Shop() {
         </div>
         <p className="mt-2 text-xs text-cocoa">Progress: {counters.drink} drinks · {counters.parfait} parfaits · {counters.crepe} crêpes · {counters.cookiesBaked} cookies baked · {counters.uploads} uploads</p>
       </section>
-    </div>
+    </ModeFrame>
   );
 }

@@ -18,9 +18,13 @@ import { hashStr, seasonNow } from '../utils/misc';
 import { SEASONS } from '../data/catalog';
 import type { StageItem } from '../types';
 import { FloatingDeco } from '../components/common/Sparkles';
+import { sfx } from '../utils/sound';
 
 export const cafeItemRender = (theme: string) => (it: StageItem) =>
   it.ref === 'f-window' ? <ItemContent it={{ ...it, text: theme }} /> : <ItemContent it={it} />;
+
+const MODE_OF: Record<string, string> = { '/drink': 'drink', '/parfait': 'parfait', '/crepe': 'crepe', '/cookie': 'cookie' };
+const MODE_TAG: Record<string, string> = { '/drink': '純喫茶', '/parfait': '春限定', '/crepe': '人気', '/cookie': '焼きたて' };
 
 const INSPIRATION = [
   { t: 'Make a Melon Cream Soda with a cherry on top — the kissaten classic.', to: '/drink', jp: 'メロンソーダ' },
@@ -64,7 +68,7 @@ function ModeArt({ to }: { to: string }) {
   if (to === '/drink') return <svg viewBox={vb} className="h-full w-full"><ArtDefs /><DrinkArt d={drink} /></svg>;
   if (to === '/parfait') return <svg viewBox={vb} className="h-full w-full"><ArtDefs /><ParfaitArt d={parfait} /></svg>;
   if (to === '/crepe') return <svg viewBox="50 90 300 440" className="h-full w-full"><ArtDefs /><CrepeArt d={crepe} /></svg>;
-  if (to === '/cookie') return <svg viewBox="40 40 420 420" className="h-full w-full"><ArtDefs /><CookieScene d={cookie} /></svg>;
+  if (to === '/cookie') return <svg viewBox="10 10 480 480" className="h-full w-full overflow-hidden"><ArtDefs /><CookieScene d={cookie} /></svg>;
   return null;
 }
 
@@ -88,7 +92,7 @@ export default function Home() {
       <FloatingDeco className="opacity-60" />
       {/* hero */}
       <section className="relative">
-        <div className="stage-surface cursor-pointer" onClick={() => nav('/cafe')} role="link" aria-label="Open My Café">
+        <div className="stage-surface cursor-pointer transition duration-300 hover:shadow-[0_18px_40px_-14px_rgba(94,69,53,.6)]" onClick={() => nav('/cafe')} role="link" aria-label="Open My Café">
           <svg viewBox={`0 0 ${CAFE_W} ${CAFE_H}`} className="block w-full">
             <ArtDefs />
             <CafeScene layout={layout} view="interior">
@@ -96,16 +100,16 @@ export default function Home() {
             </CafeScene>
           </svg>
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-3 p-3 sm:flex-row sm:items-end sm:p-5">
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="paper pointer-events-auto flex items-center gap-3 px-4 py-3">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-strawberry font-display text-xl text-white">{(player?.name || 'Y')[0].toUpperCase()}</div>
+        <div className="relative mt-3 flex flex-col gap-3 sm:pointer-events-none sm:absolute sm:inset-x-0 sm:bottom-0 sm:mt-0 sm:flex-row sm:items-end sm:p-5">
+          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="plaque pointer-events-auto flex items-center gap-3 !px-4 !py-3 !text-cocoa-dark">
+            <div className="badge-round h-12 w-12 shrink-0 aspect-square font-display text-xl">{(player?.name || 'Y')[0].toUpperCase()}</div>
             <div>
-              <div className="font-display text-base leading-tight">{player?.name || 'Yumi'}’s Café</div>
+              <div className="font-display text-base leading-tight text-kiss-red">{player?.name || 'Yumi'}’s Café</div>
               <div className="text-xs text-cocoa">Level {lvl} · {s.name}</div>
-              <div className="mt-1 h-2 w-36 overflow-hidden rounded-full bg-cream"><div className="h-full bg-matcha-deep" style={{ width: `${((total % STARS_PER_LEVEL) / STARS_PER_LEVEL) * 100}%` }} /></div>
+              <div className="mt-1 h-2 w-36 overflow-hidden rounded-full bg-white/80 ring-1 ring-kiss-green/20"><motion.div className="h-full rounded-full bg-gradient-to-r from-matcha to-kiss-green" initial={{ width: 0 }} animate={{ width: `${((total % STARS_PER_LEVEL) / STARS_PER_LEVEL) * 100}%` }} transition={{ duration: 1, delay: 0.4, ease: 'easeOut' }} /></div>
             </div>
           </motion.div>
-          <div className="flex-1" />
+          <div className="hidden flex-1 sm:block" />
           <motion.button initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.15 }} className="btn-deep pointer-events-auto px-6 py-3 text-base" onClick={(e) => { e.stopPropagation(); nav(lastNav.to); }}>
             <Play size={18} className="fill-white" />Continue · {lastNav.label}
           </motion.button>
@@ -114,18 +118,20 @@ export default function Home() {
 
       {/* modes */}
       <section>
-        <h2 className="mb-3 flex items-baseline gap-2 font-display text-xl">Today’s kitchen <span className="label-jp text-xs text-strawberry-deep">きょうのメニュー</span></h2>
+        <h2 className="h-section mb-3" data-mode="cafe">Today’s kitchen <span className="jp">きょうのメニュー</span></h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {NAV.slice(1, 5).map((n, i) => (
             <motion.div key={n.to} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: i * 0.06 }}>
-              <Link to={n.to} className="paper card-hover group relative flex h-full flex-col overflow-hidden">
-                <div className="relative h-36 sm:h-44" style={{ background: `linear-gradient(180deg, ${n.color}, #FFF8ED)` }}>
-                  <div className="absolute left-2 top-2 rounded-md bg-white/85 px-1.5 py-2 font-jp text-[11px] font-bold text-cocoa vertical-jp">{n.jp}</div>
-                  <div className="absolute inset-0 transition group-hover:scale-105"><ModeArt to={n.to} /></div>
+              <Link to={n.to} data-mode={MODE_OF[n.to]} onClick={() => sfx('select')} className="paper card-hover group relative flex h-full flex-col overflow-hidden">
+                <div className="relative h-36 overflow-hidden sm:h-44" style={{ background: 'linear-gradient(180deg, var(--tint2), var(--tint) 75%, #fffdf8)' }}>
+                  <div className="mode-band !static !h-full !opacity-60" aria-hidden />
+                  <div className="absolute inset-x-3 bottom-1 top-4 overflow-hidden transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"><ModeArt to={n.to} /></div>
+                  <div className="absolute left-2 top-2 z-10 rounded-md bg-kiss-cream px-1.5 py-2 font-jp text-[11px] font-bold text-kiss-red vertical-jp shadow-sticker">{n.jp}</div>
+                  <div className="badge-round absolute right-2 top-2 z-10 h-11 w-11 aspect-square rotate-[10deg] text-[9px] transition duration-300 group-hover:rotate-[24deg] group-hover:scale-110">{MODE_TAG[n.to]}</div>
                 </div>
-                <div className="flex items-center justify-between px-3 py-2">
-                  <span className="font-display text-sm">{n.label}</span>
-                  <n.icon size={16} className="text-strawberry-deep" />
+                <div className="flex items-center justify-between border-t-2 border-dotted px-3 py-2" style={{ borderColor: 'var(--tint2)' }}>
+                  <span className="font-display text-sm" style={{ color: 'var(--t1)' }}>{n.label}</span>
+                  <n.icon size={16} className="card-icon" style={{ color: 'var(--t3)' }} />
                 </div>
               </Link>
             </motion.div>
@@ -133,9 +139,9 @@ export default function Home() {
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {NAV.slice(5).map((n) => (
-            <Link key={n.to} to={n.to} className="paper card-hover flex items-center gap-3 px-3 py-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl shadow-sm" style={{ background: n.color }}><n.icon size={20} /></span>
-              <span className="min-w-0"><span className="block truncate font-display text-sm">{n.label}</span><span className="label-jp text-[10px] text-cocoa">{n.jp}</span></span>
+            <Link key={n.to} to={n.to} onClick={() => sfx('select')} className="paper card-hover group flex items-center gap-3 px-3 py-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl shadow-sm ring-2 ring-white transition group-hover:-rotate-6 group-hover:scale-110" style={{ background: n.color }}><n.icon size={20} /></span>
+              <span className="min-w-0"><span className="block font-display text-sm leading-tight">{n.label}</span><span className="label-jp text-[10px] text-cocoa">{n.jp}</span></span>
             </Link>
           ))}
         </div>
@@ -143,11 +149,12 @@ export default function Home() {
 
       <section className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
         {/* featured seasonal */}
-        <div className="paper stitch p-4">
-          <h2 className="mb-3 flex items-baseline gap-2 font-display text-lg"><Sparkles size={18} className="text-strawberry-deep" />Seasonal specials <span className="label-jp text-xs text-strawberry-deep">{s.jp} 期間限定</span></h2>
+        <div className="paper stitch relative p-4">
+          <span className="tape tape-l" /><span className="tape tape-r" />
+          <h2 className="h-section mb-3 !text-lg" data-mode="parfait"><Sparkles size={18} className="anim-bob self-center text-strawberry-deep" />Seasonal specials <span className="pill-label ml-auto self-center">{s.jp} 期間限定</span></h2>
           <div className="grid gap-2 sm:grid-cols-3">
             {FEATURED[season].map((f) => (
-              <Link key={f.name} to={f.to} className="card-hover rounded-2xl p-3" style={{ background: `${s.color}55` }}>
+              <Link key={f.name} to={f.to} onClick={() => sfx('select')} className="card-hover rounded-2xl border-2 border-white p-3 shadow-sm" style={{ background: `linear-gradient(160deg, ${s.color}88, #fffdf8)` }}>
                 <div className="label-jp text-[11px] text-strawberry-dark">{f.jp}</div>
                 <div className="font-display text-sm leading-tight">{f.name}</div>
                 <div className="mt-1 text-[11px] text-cocoa">{f.desc}</div>
@@ -156,19 +163,19 @@ export default function Home() {
           </div>
         </div>
         {/* inspiration */}
-        <div className="paper relative overflow-hidden p-4" style={{ background: 'linear-gradient(135deg,#FFF6DA,#FBE3EA)' }}>
-          <h2 className="mb-2 flex items-center gap-2 font-display text-lg"><Wand2 size={18} className="text-strawberry-deep" />Daily inspiration</h2>
-          <div className="label-jp text-sm text-strawberry-dark">{idea.jp}</div>
+        <div className="paper gingham-frame relative overflow-hidden p-4" style={{ background: 'linear-gradient(135deg,#FFF6DA,#FBE3EA)' }}>
+          <h2 className="mb-2 flex items-center gap-2 font-display text-lg text-kiss-red"><Wand2 size={18} className="anim-wiggle text-strawberry-deep" />Daily inspiration</h2>
+          <div className="ribbon mb-2">{idea.jp}</div>
           <p className="mb-3 text-sm">{idea.t}</p>
           <Link to={idea.to} className="btn-pink btn-sm">Let’s make it ♡</Link>
-          <Star className="absolute -bottom-4 -right-4 h-24 w-24 rotate-12 fill-butter text-butter opacity-70" />
+          <Star className="anim-bob pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 rotate-12 fill-butter text-butter opacity-70" />
         </div>
       </section>
 
       {/* recent */}
       <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-xl">Recently created <span className="label-jp text-xs text-strawberry-deep">さいきんの作品</span></h2>
+        <div className="mb-3 flex items-end gap-3">
+          <h2 className="h-section flex-1" data-mode="collection">Recently created <span className="jp">さいきんの作品</span></h2>
           <Link to="/collection" className="text-sm font-bold text-strawberry-deep underline">See all</Link>
         </div>
         {recent.length ? (

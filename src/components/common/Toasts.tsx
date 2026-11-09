@@ -13,10 +13,12 @@ export function Toasts() {
             key={t.id}
             layout
             onClick={() => dismiss(t.id)}
-            initial={{ y: -30, opacity: 0, scale: 0.9 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
+            initial={{ y: -40, opacity: 0, scale: 0.8, rotate: -3 }}
+            animate={{ y: 0, opacity: 1, scale: 1, rotate: 0 }}
             exit={{ y: -20, opacity: 0, scale: 0.9 }}
-            className={`pointer-events-auto flex max-w-sm items-center gap-2 rounded-full border-2 bg-white px-4 py-2 text-sm font-bold shadow-card ${
+            transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+            whileHover={{ scale: 1.04 }}
+            className={`pointer-events-auto flex max-w-sm items-center gap-2 rounded-full border-2 bg-kiss-cream px-4 py-2 text-sm font-bold shadow-plaque ${
               t.tone === 'star' ? 'border-butter text-cocoa-dark' : t.tone === 'error' ? 'border-strawberry-dark text-strawberry-dark' : t.tone === 'success' ? 'border-matcha text-matcha-dark' : 'border-strawberry text-cocoa-dark'
             }`}
           >

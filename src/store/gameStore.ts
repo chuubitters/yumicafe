@@ -60,7 +60,7 @@ export const useGame = create<GameState>()(
         const after = levelFor(get().totalEarned);
         if (after > before) {
           setTimeout(() => {
-            sfx('sparkle');
+            sfx('levelup');
             toast(`Café level up! You're now level ${after} ✿`, 'success');
           }, 500);
         }

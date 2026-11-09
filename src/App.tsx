@@ -12,7 +12,7 @@ import { useAssets } from './store/assetStore';
 import { useCollection } from './store/collectionStore';
 import { useSettings } from './store/settingsStore';
 import { useGame } from './store/gameStore';
-import { setMusic } from './utils/sound';
+import { setMusic, installAudioUnlock, installUiSounds } from './utils/sound';
 import Welcome from './pages/Welcome';
 import Home from './pages/Home';
 
@@ -31,6 +31,11 @@ export default function App() {
   const [entered, setEntered] = useState(() => sessionStorage.getItem('yumi-entered') === '1' && !!useGame.getState().player);
   const reduced = useSettings((s) => s.reducedMotion);
   const music = useSettings((s) => s.musicEnabled);
+
+  useEffect(() => {
+    installAudioUnlock();
+    return installUiSounds();
+  }, []);
 
   useEffect(() => {
     useAssets.getState().load();

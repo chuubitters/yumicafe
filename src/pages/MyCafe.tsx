@@ -20,6 +20,7 @@ import { sfx } from '../utils/sound';
 import { confirmDialog } from '../components/common/ConfirmDialog';
 import { cafeItemRender } from './Home';
 import { defaultCafe } from '../store/cafeStore';
+import { ModeFrame, TitleBlock, Stamp } from '../components/common/PosterTitle';
 
 export default function MyCafe() {
   const stored = useCafe((s) => s.layout);
@@ -88,12 +89,10 @@ export default function MyCafe() {
   const showcase = creations.filter((c) => c.type !== 'cafe');
 
   return (
-    <div className="mx-auto flex max-w-[1500px] flex-col gap-3 px-3 py-3 md:px-5">
+    <ModeFrame mode="cafe" className="mx-auto flex max-w-[1500px] flex-col gap-3 px-3 py-3 md:px-5">
       <header className="flex flex-wrap items-start gap-3">
-        <div className="badge-limited hidden !bg-[#C8784A] sm:block">マイカフェ</div>
         <div className="min-w-[220px] flex-1">
-          <h1 className="font-display text-2xl text-shadow-soft md:text-3xl">My Café</h1>
-          <p className="text-xs text-cocoa md:text-sm">Decorate every corner and show off the sweets you made. Changes save automatically.</p>
+          <TitleBlock small title="My Café" jp="マイカフェ" subtitle="Decorate every corner and show off the sweets you made. Changes save automatically." />
         </div>
         <div className="flex flex-wrap gap-2">
           <button className="btn-icon" onClick={h.undo} disabled={!h.canUndo} aria-label="Undo"><Undo2 size={16} /></button>
@@ -209,6 +208,6 @@ export default function MyCafe() {
       </div>
       <ResultModal open={result} onClose={() => setResult(false)} svgRef={svgRef} size={{ w: CAFE_W / 1.5, h: CAFE_H / 1.5 }} type="cafe"
         defaultName={`${SEASONS.find((s) => s.id === L.theme)!.name} (${view === 'interior' ? 'inside' : 'front'})`} ingredients={[view === 'interior' ? 'Interior' : 'Storefront', SEASONS.find((s) => s.id === L.theme)!.jp]} data={L} season={L.theme} />
-    </div>
+    </ModeFrame>
   );
 }

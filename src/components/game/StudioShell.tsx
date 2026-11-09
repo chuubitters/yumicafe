@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Redo2, Undo2, Check } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
 import { sfx } from '../../utils/sound';
+import { ModeFrame, PosterTitle, type ModeId } from '../common/PosterTitle';
 
 export interface StepDef { id: string; label: string; jp?: string }
 
@@ -9,7 +10,8 @@ interface Props {
   title: string;
   jp: string;
   subtitle?: string;
-  accent: string; // tailwind bg class for badge
+  accent?: string; // legacy (unused)
+  mode: ModeId;
   steps: StepDef[];
   step: number;
   setStep: (n: number) => void;
@@ -26,7 +28,7 @@ interface Props {
   stageHint?: ReactNode;
 }
 
-export function StudioShell({ title, jp, subtitle, accent, steps, step, setStep, canNext = true, nextHint, stage, stageFooter, panel, headerRight, onFinish, finishLabel = 'Finish!', undo, stageTools, stageHint }: Props) {
+export function StudioShell({ title, jp, subtitle, mode, steps, step, setStep, canNext = true, nextHint, stage, stageFooter, panel, headerRight, onFinish, finishLabel = 'Finish!', undo, stageTools, stageHint }: Props) {
   const last = step === steps.length - 1;
   useEffect(() => {
     if (!undo) return;
@@ -46,26 +48,17 @@ export function StudioShell({ title, jp, subtitle, accent, steps, step, setStep,
   const go = (n: number) => { sfx('click'); setStep(Math.max(0, Math.min(steps.length - 1, n))); };
 
   return (
-    <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-3 px-3 pb-6 pt-3 md:px-5 lg:pt-5">
-      {/* poster header */}
-      <header className="flex items-start gap-3">
-        <div className={`badge-limited hidden sm:block ${accent}`}>{jp}</div>
-        <div className="min-w-0 flex-1">
-          <div className="label-jp text-xs text-strawberry-deep sm:hidden">{jp}</div>
-          <h1 className="font-display text-2xl leading-tight text-cocoa-dark text-shadow-soft md:text-3xl">{title}</h1>
-          {subtitle && <p className="text-xs text-cocoa md:text-sm">{subtitle}</p>}
-        </div>
-        {headerRight}
-      </header>
+    <ModeFrame mode={mode} className="mx-auto flex w-full max-w-[1400px] flex-col gap-3 px-3 pb-6 pt-3 md:px-5 lg:pt-5">
+      <PosterTitle mode={mode} title={title} jp={jp} subtitle={subtitle} right={headerRight} />
 
       {/* steps */}
       <nav aria-label="Steps" className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
         {steps.map((s, i) => (
           <button key={s.id} onClick={() => (i <= step || canNext) && go(i)} aria-current={i === step ? 'step' : undefined}
             className={`flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-bold transition ${
-              i === step ? 'border-strawberry-deep bg-strawberry text-[#7A2E43] shadow-soft' : i < step ? 'border-matcha bg-white text-matcha-dark' : 'border-transparent bg-white/70 text-cocoa-light'
+              i === step ? 'scale-[1.04] border-[var(--t1)] bg-[var(--tint)] text-[var(--t1)] shadow-sticker' : i < step ? 'border-matcha bg-white text-matcha-dark hover:-translate-y-0.5' : 'border-transparent bg-white/70 text-cocoa-light'
             }`}>
-            <span className={`grid h-5 w-5 place-items-center rounded-full text-[10px] ${i < step ? 'bg-matcha text-white' : i === step ? 'bg-white text-strawberry-dark' : 'bg-cream'}`}>{i < step ? <Check size={11} /> : i + 1}</span>
+            <span className={`grid h-5 w-5 place-items-center rounded-full text-[10px] ${i < step ? 'bg-matcha text-white' : i === step ? 'bg-[var(--t1)] text-white' : 'bg-cream'}`}>{i < step ? <Check size={11} /> : i + 1}</span>
             {s.label}
           </button>
         ))}
@@ -79,8 +72,8 @@ export function StudioShell({ title, jp, subtitle, accent, steps, step, setStep,
             {stageTools}
             {undo && (
               <>
-                <button className="btn-icon !h-9 !w-9" onClick={undo.undo} disabled={!undo.canUndo} aria-label="Undo" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
-                <button className="btn-icon !h-9 !w-9" onClick={undo.redo} disabled={!undo.canRedo} aria-label="Redo" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
+                <button className="btn-icon !h-9 !w-9" onClick={() => { sfx('undo'); undo.undo(); }} disabled={!undo.canUndo} aria-label="Undo" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
+                <button className="btn-icon !h-9 !w-9" onClick={() => { sfx('redo'); undo.redo(); }} disabled={!undo.canRedo} aria-label="Redo" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
               </>
             )}
           </div>
@@ -89,12 +82,12 @@ export function StudioShell({ title, jp, subtitle, accent, steps, step, setStep,
         </section>
 
         {/* panel */}
-        <aside className="paper flex min-w-0 flex-col gap-3 p-4 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start">
+        <aside className="paper stitch relative flex min-w-0 flex-col gap-3 p-4 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-strawberry font-display text-sm text-white">{step + 1}</span>
+            <motion.span key={step} initial={{ scale: 0.3, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 14 }} className="badge-round h-9 w-9 shrink-0 aspect-square text-sm font-display">{step + 1}</motion.span>
             <div>
-              {steps[step].jp && <div className="label-jp text-[10px] text-strawberry-deep">{steps[step].jp}</div>}
-              <h2 className="font-display text-base leading-tight">{steps[step].label}</h2>
+              {steps[step].jp && <div className="label-jp text-[10px]" style={{ color: 'var(--t3)' }}>{steps[step].jp}</div>}
+              <h2 className="font-display text-base leading-tight" style={{ color: 'var(--t1)' }}>{steps[step].label}</h2>
             </div>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0.5">
@@ -115,7 +108,7 @@ export function StudioShell({ title, jp, subtitle, accent, steps, step, setStep,
           </div>
         </aside>
       </div>
-    </div>
+    </ModeFrame>
   );
 }
 
@@ -126,11 +119,11 @@ export function OptionGrid<T extends { id: string; name: string }>({ options, va
   const rec = (id: string) => (Array.isArray(recommended) ? recommended.includes(id) : recommended === id);
   return (
     <div className={`grid gap-2 ${cols}`}>
-      {options.map((o) => {
+      {options.map((o, idx) => {
         const locked = isLocked?.(o);
         return (
-          <button key={o.id} type="button" disabled={locked} onClick={() => { sfx('pop'); onPick(o); }} className={`tile min-h-[84px] ${on(o.id) ? 'tile-on' : ''} ${locked ? 'tile-locked' : ''}`} aria-pressed={on(o.id)}>
-            {rec(o.id) && <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-matcha-deep px-2 py-0.5 text-[9px] font-bold text-white">レシピ</span>}
+          <button key={o.id} style={{ ['--i' as any]: `${Math.min(idx, 14) * 22}ms` }} type="button" disabled={locked} onClick={() => { sfx('pop'); onPick(o); }} className={`tile anim-rise min-h-[84px] ${on(o.id) ? 'tile-on' : ''} ${locked ? 'tile-locked' : ''}`} aria-pressed={on(o.id)}>
+            {rec(o.id) && <span className="pill-label absolute -top-2 left-1/2 -translate-x-1/2 !bg-none !bg-kiss-green !px-2 !py-0 !text-[9px]">レシピ</span>}
             {render?.(o)}
             <span className="text-center leading-tight">{o.name}</span>
             {locked && <span className="text-[9px] text-cocoa">🔒 Shop</span>}

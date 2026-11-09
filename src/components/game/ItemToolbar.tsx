@@ -38,7 +38,7 @@ export function ItemToolbar({ items, selectedId, setItems, onSelect, compact }: 
         {!compact && <button className={btn} title="Send to back" aria-label="Send to back" onClick={() => setItems(reorder(items, it.id, 'bottom'))}><ArrowDownToLine size={15} /></button>}
         <button className={btn} title="Duplicate" aria-label="Duplicate" onClick={() => { const c = { ...it, id: uid('it'), x: it.x + 18, y: it.y + 18 }; setItems([...items, c]); onSelect(c.id); sfx('pop'); }}><Copy size={15} /></button>
         {it.kind === 'image' && <button className={btn} title="Crop" aria-label="Crop" onClick={async () => { const id = await cropAsset(it.ref); if (id) upd({ ref: id }); }}><Crop size={15} /></button>}
-        <button className={`${btn} !text-strawberry-dark`} title="Delete" aria-label="Delete" onClick={() => { setItems(items.filter((x) => x.id !== it.id)); onSelect(null); sfx('click'); }}><Trash2 size={15} /></button>
+        <button className={`${btn} !text-strawberry-dark`} title="Delete" aria-label="Delete" onClick={() => { sfx('delete'); setItems(items.filter((x) => x.id !== it.id)); onSelect(null); sfx('click'); }}><Trash2 size={15} /></button>
       </div>
 
       {(it.kind === 'text' || def?.textual) && (

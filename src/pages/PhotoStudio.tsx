@@ -21,6 +21,7 @@ import { svgToBlob } from '../utils/exportImage';
 import { downloadBlob, uid } from '../utils/misc';
 import { sfx } from '../utils/sound';
 import { toast } from '../store/toastStore';
+import { ModeFrame, TitleBlock, Stamp } from '../components/common/PosterTitle';
 
 interface Project {
   template: string;
@@ -200,12 +201,10 @@ export default function PhotoStudio() {
   ] as const;
 
   return (
-    <div className="mx-auto flex max-w-[1500px] flex-col gap-3 px-3 py-3 md:px-5">
+    <ModeFrame mode="photo" className="mx-auto flex max-w-[1500px] flex-col gap-3 px-3 py-3 md:px-5">
       <header className="flex flex-wrap items-start gap-3">
-        <div className="badge-limited hidden !bg-[#6E9DB5] sm:block">フォト</div>
         <div className="min-w-[220px] flex-1">
-          <h1 className="font-display text-2xl text-shadow-soft md:text-3xl">Photo Studio</h1>
-          <p className="text-xs text-cocoa md:text-sm">Compose your creations into shareable artwork · {PHOTO_TEMPLATES.find((t) => t.id === p.template)?.name} {p.w}×{p.h}</p>
+          <TitleBlock small title="Photo Studio" jp="フォトスタジオ" subtitle={<>Compose your creations into shareable artwork · {PHOTO_TEMPLATES.find((t) => t.id === p.template)?.name} {p.w}×{p.h}</>} />
         </div>
         <div className="flex flex-wrap gap-2">
           <button className="btn-icon" onClick={h.undo} disabled={!h.canUndo} aria-label="Undo"><Undo2 size={16} /></button>
@@ -295,6 +294,6 @@ export default function PhotoStudio() {
           </motion.div>
         )}
       </Modal>
-    </div>
+    </ModeFrame>
   );
 }

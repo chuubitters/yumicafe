@@ -320,16 +320,16 @@ export default function CookieBakery() {
   return (
     <>
       <StudioShell
-        title="Cookie Bakery" jp="クッキーベーカリー" accent="!bg-[#92745F]"
+        title="Cookie Bakery" jp="クッキーベーカリー" mode="cookie"
         subtitle="Mix, knead, cut, bake — then pipe royal icing like a pro."
         steps={STEPS} step={step} setStep={setStep} canNext={canNext} nextHint={nextHint}
         undo={{ undo: h.undo, redo: h.redo, canUndo: h.canUndo, canRedo: h.canRedo }}
         stageHint={step === 5 ? <span className="chip">{tool === 'pipe' ? '🖌️ Draw icing on a cookie' : tool === 'flood' ? '🪣 Tap a cookie to flood it' : '👆 Move stickers'}</span> : step === 1 || step === 2 ? <span className="chip">{nextHint || 'Ready! ✓'}</span> : null}
-        stageTools={<BgPicker value={st.bg || 'bg-bakery'} onChange={st.setBg} />}
+        stageTools={<BgPicker value={st.bg || 'bg-pudding'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setResult(true); }}
         finishLabel="Finish cookies ✿"
         stage={
-          <Stage ref={st.svgRef} width={500} height={500} bgClassName={st.bg || 'bg-bakery'} maxHeight="var(--stage-max-h)"
+          <Stage ref={st.svgRef} width={500} height={500} bgClassName={st.bg || 'bg-pudding'} maxHeight="var(--stage-max-h)"
             onDrop={onDrop} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} cursor={step === 5 && tool !== 'select' ? 'crosshair' : undefined} ariaLabel="Your cookies">
             {scene}
             {step >= 5 && (

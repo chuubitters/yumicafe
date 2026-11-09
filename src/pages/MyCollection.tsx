@@ -16,6 +16,7 @@ import { creationCard } from '../utils/exportImage';
 import { downloadBlob, formatDate, safeName } from '../utils/misc';
 import { sfx } from '../utils/sound';
 import type { Creation } from '../types';
+import { ModeFrame, TitleBlock, Stamp } from '../components/common/PosterTitle';
 
 const CATS = [
   { id: 'all', label: 'All', jp: 'すべて' },
@@ -86,7 +87,7 @@ export default function MyCollection() {
   };
 
   return (
-    <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-3 py-4 md:px-5">
+    <ModeFrame mode="collection" className="mx-auto flex max-w-[1400px] flex-col gap-4 px-3 py-4 md:px-5">
       {/* album cover */}
       <section className="paper relative flex flex-col items-center gap-4 overflow-hidden p-4 sm:flex-row sm:p-5" style={{ background: 'linear-gradient(135deg,#FBE3EA 0%,#FFF8ED 60%,#EEF3E6 100%)' }}>
         <div className="relative h-32 w-28 shrink-0 rotate-[-4deg] overflow-hidden rounded-xl border-[6px] border-white bg-strawberry shadow-card">
@@ -94,8 +95,8 @@ export default function MyCollection() {
           <span className="absolute -top-1 left-6 h-4 w-14 rotate-[-8deg] bg-butter/80" />
         </div>
         <div className="flex-1 text-center sm:text-left">
-          <div className="label-jp text-xs text-strawberry-deep">コレクションブック</div>
-          <h1 className="font-display text-2xl md:text-3xl">{player?.name || 'Yumi'}’s Sweet Collection</h1>
+          <div className="poster-kicker">✦ コレクションブック ✦</div>
+          <h1 className="poster-title text-2xl sm:text-3xl">{player?.name || 'Yumi'}’s Sweet Collection</h1>
           <p className="text-sm text-cocoa">{creations.length} creations · {creations.filter((c) => c.isFavorite).length} favorites</p>
         </div>
         <button className="btn-cream btn-sm" onClick={async () => { const id = await openImageLibrary('Album cover'); if (id) setS({ albumCoverId: id }); }}><ImagePlus size={14} />Album cover</button>
@@ -182,6 +183,6 @@ export default function MyCollection() {
           </div>
         )}
       </Modal>
-    </div>
+    </ModeFrame>
   );
 }

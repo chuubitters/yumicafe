@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { sfx } from '../../utils/sound';
 
 interface ModalProps {
   open: boolean;
@@ -15,6 +16,13 @@ interface ModalProps {
 }
 
 export function Modal({ open, onClose, title, jp, children, wide, footer, dismissable = true }: ModalProps) {
+  const was = useRef(false);
+  useEffect(() => {
+    if (open && !was.current) sfx('open');
+    if (!open && was.current) sfx('close');
+    was.current = open;
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const k = (e: KeyboardEvent) => e.key === 'Escape' && dismissable && onClose();
@@ -37,7 +45,8 @@ export function Modal({ open, onClose, title, jp, children, wide, footer, dismis
             transition={{ type: 'spring', stiffness: 260, damping: 24 }}
           >
             {(title || dismissable) && (
-              <div className="flex items-center gap-3 border-b border-dashed border-strawberry/60 px-5 py-3">
+              <div className="relative flex items-center gap-3 border-b-2 border-dotted border-strawberry/60 bg-gradient-to-b from-[#FFF0F4] to-transparent px-5 py-3">
+                <span className="awning absolute inset-x-0 top-0 !h-[7px] opacity-90" aria-hidden />
                 <div className="min-w-0 flex-1">
                   {jp && <div className="label-jp text-[11px] text-strawberry-deep">{jp}</div>}
                   {title && <h2 className="font-display text-lg leading-tight text-cocoa-dark">{title}</h2>}

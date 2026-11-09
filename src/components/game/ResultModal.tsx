@@ -63,6 +63,7 @@ export function ResultModal({ open, onClose, svgRef, size, type, defaultName, in
   }, [open]);
 
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview.url); }, [preview]);
+  useEffect(() => { if (preview && open) { sfx('success'); setTimeout(() => sfx('cheer'), 250); } }, [preview, open]);
 
   const doSave = async (asNew = false) => {
     if (!preview) return;
@@ -70,7 +71,8 @@ export function ResultModal({ open, onClose, svgRef, size, type, defaultName, in
     try {
       const c = await save({ id: asNew ? undefined : editingId || undefined, name: name.trim() || defaultName, type, ingredients, data: structuredClone(data), previewW: size.w * 1.5, previewH: size.h * 1.5, isRecipe, season }, preview.blob);
       setSaved(c);
-      sfx('ding');
+      sfx('coin');
+      setTimeout(() => sfx('stamp'), 120);
       const g = useGame.getState();
       if (asNew || !editingId) {
         g.bump(type === 'cafe' ? 'cafe' : type);
@@ -99,6 +101,12 @@ export function ResultModal({ open, onClose, svgRef, size, type, defaultName, in
       <div className="grid gap-5 md:grid-cols-[1fr_1fr]">
         <div className="relative grid place-items-center rounded-3xl bg-strawberry-drip p-4" style={{ minHeight: 280 }}>
           <div className="bg-strawberry-drip absolute inset-0 rounded-3xl" />
+          <div className="absolute inset-0 overflow-hidden rounded-3xl" aria-hidden>
+            <div className="sunburst anim-sun absolute left-1/2 top-1/2 h-[170%] w-[170%] -translate-x-1/2 -translate-y-1/2 opacity-60" style={{ aspectRatio: '1 / 1' }} />
+            <div className="absolute inset-2 rounded-[22px] border-2 border-dashed border-white/80" />
+          </div>
+          <motion.div initial={{ scale: 3, opacity: 0, rotate: -30 }} animate={{ scale: 1, opacity: 1, rotate: -12 }} transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 14 }}
+            className="badge-round absolute right-3 top-3 z-10 h-[62px] w-[62px] shrink-0 aspect-square text-[11px]" aria-hidden>{saved ? <>保存<br />ずみ</> : <>できた<br />♡</>}</motion.div>
           {preview ? (
             <motion.img key={preview.url} src={preview.url} alt="Your creation" className="relative max-h-[46vh] w-auto drop-shadow-xl" initial={{ scale: 0.6, rotate: -6, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 160, damping: 12 }} />
           ) : (

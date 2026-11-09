@@ -273,17 +273,17 @@ export default function ParfaitAtelier() {
   return (
     <>
       <StudioShell
-        title="Parfait Atelier" jp="パフェアトリエ" accent="!bg-[#7E9A63]"
+        title="Parfait Atelier" jp="パフェアトリエ" mode="parfait"
         subtitle="Layer jelly, flakes, fruit and ice cream — then crown it with cute toppings."
         steps={STEPS} step={step} setStep={setStep}
         canNext={step === 1 ? d.layers.length > 0 : true} nextHint="Add a base layer first"
         undo={{ undo: h.undo, redo: h.redo, canUndo: h.canUndo, canRedo: h.canRedo }}
         stageHint={step === 4 ? <span className="chip">🧁 Press & hold to pipe</span> : step === 2 ? <span className="chip">🍨 Drag scoops onto the glass</span> : null}
-        stageTools={<BgPicker value={st.bg || 'bg-matcha-tatami'} onChange={st.setBg} />}
+        stageTools={<BgPicker value={st.bg || 'bg-fukuda'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setTopSel(null); setResult(true); }}
         finishLabel="Finish parfait ✿"
         stage={
-          <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-matcha-tatami'} maxHeight="var(--stage-max-h)"
+          <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-fukuda'} maxHeight="var(--stage-max-h)"
             onDrop={onDrop} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} cursor={step === 4 ? 'crosshair' : undefined} ariaLabel="Your parfait">
             <ParfaitArt d={d} animate pipingPreview={piping} />
             {step === 2 && selTop && <circle data-export-ignore cx={selTop.x} cy={selTop.y - selTop.size * 0.3} r={selTop.size * 1.05} fill="none" stroke="#E8869F" strokeWidth="2" strokeDasharray="6 5" pointerEvents="none" />}

@@ -32,6 +32,11 @@ export function useStudio<T>(type: CreationType, onLoad: (data: T, id: string) =
 }
 
 export const STAGE_BGS = [
+  { id: 'bg-showa', name: 'Showa' },
+  { id: 'bg-peko', name: 'Peko' },
+  { id: 'bg-pudding', name: 'Pudding' },
+  { id: 'bg-fukuda', name: 'Wagashi' },
+  { id: 'bg-slats', name: 'Wood' },
   { id: 'bg-kissaten', name: 'Kissaten' },
   { id: 'bg-strawberry-drip', name: 'Strawberry' },
   { id: 'bg-matcha-tatami', name: 'Matcha' },

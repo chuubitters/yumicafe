@@ -42,7 +42,7 @@ function GlassThumb({ id }: { id: string }) {
   const g = GLASSES[id];
   const d = useMemo(() => ({ ...emptyDrink(), glass: id }), [id]);
   if (!g) return null;
-  return <svg viewBox="80 110 240 380" className="h-14 w-12 rounded-lg bg-kissaten"><ArtDefs /><DrinkArt d={d} /></svg>;
+  return <svg viewBox="80 110 240 380" className="h-14 w-12 rounded-lg bg-showa"><ArtDefs /><DrinkArt d={d} /></svg>;
 }
 
 export default function DrinkStudio() {
@@ -155,7 +155,7 @@ export default function DrinkStudio() {
             <div className="flex flex-col gap-2">
               {DRINK_RECIPES.map((r) => (
                 <button key={r.id} onClick={() => startRecipe(r.id)} className="card-hover flex gap-3 rounded-2xl bg-white/90 p-2 text-left shadow-soft">
-                  <svg viewBox="70 50 260 460" className="h-24 w-16 shrink-0 rounded-xl bg-kissaten"><ArtDefs /><DrinkArt d={recipeDrink(r.id)} /></svg>
+                  <svg viewBox="70 50 260 460" className="h-24 w-16 shrink-0 rounded-xl bg-showa"><ArtDefs /><DrinkArt d={recipeDrink(r.id)} /></svg>
                   <span className="min-w-0 flex-1">
                     <span className="label-jp block text-[10px] text-strawberry-deep">{r.jp}</span>
                     <span className="block font-display text-sm leading-tight">{r.name}</span>
@@ -266,16 +266,16 @@ export default function DrinkStudio() {
   return (
     <>
       <StudioShell
-        title="Drink Studio" jp="ドリンクスタジオ" accent="!bg-[#6E9DB5]"
+        title="Drink Studio" jp="ドリンクスタジオ" mode="drink"
         subtitle={recipe ? `Recipe: ${recipe.name} — ${recipe.jp}` : 'Become a barista and invent your own Japanese café drink.'}
         steps={STEPS} step={step} setStep={setStep} canNext={canNext} nextHint="Choose a base to continue"
         undo={{ undo: h.undo, redo: h.redo, canUndo: h.canUndo, canRedo: h.canRedo }}
         stageHint={recipe && step > 0 && step < 7 ? <span className="chip max-w-full truncate !bg-matcha/60 !text-matcha-dark">📖 Step {step}: {recipe.steps[Math.min(step - 1, recipe.steps.length - 1)]}</span> : step === 5 ? <span className="chip">🥄 Stir in circles on the glass</span> : null}
-        stageTools={<BgPicker value={st.bg || 'bg-kissaten'} onChange={st.setBg} />}
+        stageTools={<BgPicker value={st.bg || 'bg-showa'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setResult(true); }}
         stage={
           <motion.div animate={shake} style={{ transformOrigin: '50% 90%' }}>
-            <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-kissaten'} maxHeight="var(--stage-max-h)" onDrop={onDrop}
+            <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-showa'} maxHeight="var(--stage-max-h)" onDrop={onDrop}
               onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} cursor={step === 5 ? 'grab' : undefined} ariaLabel="Your drink">
               <DrinkArt d={d} animate stirring={stirring} />
               {pour && (

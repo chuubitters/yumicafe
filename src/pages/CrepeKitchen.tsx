@@ -258,16 +258,16 @@ export default function CrepeKitchen() {
   return (
     <>
       <StudioShell
-        title="Crêpe Kitchen" jp="クレープキッチン" accent="!bg-[#E8607E]"
+        title="Crêpe Kitchen" jp="クレープキッチン" mode="crepe"
         subtitle="Pour, swirl, flip and fold a Harajuku-style crêpe."
         steps={STEPS} step={step} setStep={setStep} canNext={canNext} nextHint={nextHint}
         undo={{ undo: h.undo, redo: h.redo, canUndo: h.canUndo, canRedo: h.canRedo }}
         stageHint={step === 1 ? <span className="chip">{nextHint}</span> : null}
-        stageTools={<BgPicker value={st.bg || 'bg-strawberry-drip'} onChange={st.setBg} />}
+        stageTools={<BgPicker value={st.bg || 'bg-peko'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setResult(true); }}
         finishLabel="Finish crêpe ✿"
         stage={
-          <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-strawberry-drip'} maxHeight="var(--stage-max-h)"
+          <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-peko'} maxHeight="var(--stage-max-h)"
             onDrop={onDrop} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} cursor={step === 1 ? 'crosshair' : undefined} ariaLabel="Your crêpe">
             {stageArt}
             {step >= 4 && (
