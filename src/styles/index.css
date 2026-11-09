@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cream: #fff8ed;
+  --pink: #f7b8c8;
+  --pink-deep: #e8869f;
+  --matcha: #b9cba5;
+  --butter: #f6e5a9;
+  --sky: #c9e2ef;
+  --cocoa: #92745f;
+  --cocoa-dark: #5e4535;
+  --peach: #f5d0be;
+  color-scheme: light;
+}
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    @apply font-body text-cocoa-dark bg-cream antialiased;
+    background-color: var(--cream);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(146, 116, 95, 0.09) 1px, transparent 0),
+      linear-gradient(180deg, #fff9f0 0%, #fff3e3 100%);
+    background-size: 18px 18px, 100% 100%;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus-visible { outline: 3px solid var(--pink-deep); outline-offset: 2px; border-radius: 12px; }
+  button { touch-action: manipulation; }
+  input[type='range'] { accent-color: var(--pink-deep); }
+}
+
+@layer components {
+  /* ---------- paper & cards ---------- */
+  .paper {
+    @apply bg-[#FFFDF8] rounded-3xl shadow-card border border-[#F1E3CF];
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .57 0 0 0 0 .45 0 0 0 0 .37 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .stitch { @apply relative; }
+  .stitch::after {
+    content: ''; position: absolute; inset: 7px; border-radius: inherit; pointer-events: none;
+    border: 2px dashed rgba(232, 134, 159, 0.45);
+  }
+  .card-hover { @apply transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_18px_34px_-14px_rgba(146,116,95,0.55)]; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-semibold text-sm select-none
+           transition-all duration-150 active:translate-y-[3px] active:shadow-none disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap;
+    box-shadow: 0 4px 0 0 rgba(146, 116, 95, 0.32), inset 0 2px 0 rgba(255, 255, 255, 0.55);
+  }
+  .btn-pink { @apply btn bg-strawberry text-[#7A2E43] hover:bg-[#F9C6D3]; }
+  .btn-deep { @apply btn bg-strawberry-deep text-white hover:bg-[#EE95AC]; }
+  .btn-matcha { @apply btn bg-matcha text-matcha-dark hover:bg-[#C7D6B6]; }
+  .btn-butter { @apply btn bg-butter text-cocoa-dark hover:bg-[#F9ECBE]; }
+  .btn-sky { @apply btn bg-sky text-[#35617A] hover:bg-[#D7EAF4]; }
+  .btn-cream { @apply btn bg-white text-cocoa-dark hover:bg-cream border border-[#F1E3CF]; }
+  .btn-cocoa { @apply btn bg-cocoa text-white hover:bg-[#A0826C]; }
+  .btn-icon { @apply btn !px-0 w-10 h-10 bg-white text-cocoa-dark border border-[#F1E3CF] hover:bg-cream; }
+  .btn-sm { @apply !px-3.5 !py-1.5 !text-xs; }
+
+  /* ---------- option tiles ---------- */
+  .tile {
+    @apply relative flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-transparent bg-white/90 p-2 text-xs font-semibold
+           text-cocoa-dark shadow-soft transition-all duration-150 hover:-translate-y-0.5 hover:border-strawberry active:scale-95 select-none;
+  }
+  .tile-on { @apply border-strawberry-deep bg-[#FFF0F4] ring-4 ring-strawberry/30; }
+  .tile-locked { @apply opacity-60 grayscale; }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold bg-white/90 border border-[#F1E3CF] text-cocoa-dark shadow-sm;
+  }
+  .label-jp { @apply font-jp font-bold tracking-wider; }
+
+  .vertical-jp { writing-mode: vertical-rl; text-orientation: upright; }
+
+  .badge-limited {
+    @apply font-jp font-bold text-white px-2 py-3 rounded-md text-sm leading-tight;
+    background: #7E9A63;
+    writing-mode: vertical-rl;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+  }
+
+  .scroll-x { @apply flex gap-2 overflow-x-auto pb-2; scrollbar-width: thin; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+
+  .input {
+    @apply w-full rounded-2xl border-2 border-[#F1E3CF] bg-white px-4 py-2.5 text-sm font-semibold text-cocoa-dark outline-none focus:border-strawberry-deep;
+  }
+
+  /* ---------- stage backdrops (CSS only, never exported) ---------- */
+  .bg-kissaten {
+    background-color: #745646;
+    background-image:
+      radial-gradient(ellipse at 50% 110%, rgba(255, 220, 190, 0.25), transparent 60%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='%23ffffff' fill-opacity='.07'%3E%3Cpath d='M20 8l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3Cpath d='M80 68l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .bg-matcha-tatami {
+    background-color: #c9d6b0;
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 40%),
+      repeating-linear-gradient(90deg, rgba(126, 154, 99, 0.18) 0 2px, transparent 2px 7px);
+  }
+  .bg-strawberry-drip {
+    background-color: #fbe3ea;
+    background-image:
+      radial-gradient(circle, rgba(247, 184, 200, 0.6) 3px, transparent 3.5px),
+      linear-gradient(180deg, #fff4ea 0%, #fbe3ea 55%, #f7c9d6 100%);
+    background-size: 22px 22px, 100% 100%;
+  }
+  .bg-bakery {
+    background-color: #e7cfae;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(146, 116, 95, 0.12) 0 1px, transparent 1px 38px),
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 3px, transparent 3px 11px),
+      linear-gradient(180deg, #ecd6b6, #d9b88e);
+  }
+  .bg-summer-sky {
+    background-color: #c9e2ef;
+    background-image:
+      radial-gradient(ellipse at 20% 15%, #fff 0 8%, transparent 9%),
+      radial-gradient(ellipse at 75% 25%, #fff 0 6%, transparent 7%),
+      linear-gradient(180deg, #a9d6ee 0%, #e4f3fa 70%, #fff7e8 100%);
+  }
+  .bg-gingham {
+    background-color: #fff;
+    background-image:
+      linear-gradient(90deg, rgba(242, 139, 168, 0.35) 50%, transparent 50%),
+      linear-gradient(0deg, rgba(242, 139, 168, 0.35) 50%, transparent 50%);
+    background-size: 36px 36px;
+  }
+  .bg-sakura {
+    background-color: #fdeef2;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cg fill='%23F7B8C8' fill-opacity='.55'%3E%3Cg transform='translate(30 30)'%3E%3Cellipse rx='6' ry='10' transform='rotate(0) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(72) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(144) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(216) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(288) translate(0 -9)'/%3E%3C/g%3E%3Cg transform='translate(100 100) scale(.7)'%3E%3Cellipse rx='6' ry='10' transform='rotate(20) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(92) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(164) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(236) translate(0 -9)'/%3E%3Cellipse rx='6' ry='10' transform='rotate(308) translate(0 -9)'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .stage-surface {
+    @apply relative overflow-hidden rounded-[28px] border-4 border-white shadow-card;
+    touch-action: none;
+  }
+}
+
+@layer components {
+  .studio-stage { --stage-max-h: 44dvh; }
+  @media (min-width: 1024px) { .studio-stage { --stage-max-h: max(380px, calc(100dvh - 330px)); } }
+  .studio-stage-sticky { position: sticky; top: 52px; z-index: 30; }
+  @media (min-width: 1024px) { .studio-stage-sticky { position: static; } }
+}
+
+@layer utilities {
+  .text-shadow-soft { text-shadow: 0 2px 0 rgba(255, 255, 255, 0.9), 0 3px 8px rgba(146, 116, 95, 0.25); }
+  .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
+}
+
+/* ---------- keyframes used by SVG art ---------- */
+@keyframes bubble-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .9; } 100% { transform: translateY(var(--rise, -260px)); opacity: 0; } }
+.anim-bubble { animation: bubble-rise linear infinite; transform-box: fill-box; }
+@keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.anim-float { animation: float-y 4s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .2; transform: scale(.6); } 50% { opacity: 1; transform: scale(1); } }
+.anim-twinkle { animation: twinkle 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.anim-swirl { animation: spin-slow 2.2s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes steam { 0% { transform: translateY(0) scaleX(1); opacity: 0; } 30% { opacity: .5; } 100% { transform: translateY(-40px) scaleX(1.4); opacity: 0; } }
+.anim-steam { animation: steam 2.8s ease-out infinite; transform-box: fill-box; transform-origin: bottom; }
+@keyframes fall { 0% { transform: translateY(-60px) rotate(0); } 100% { transform: translateY(900px) rotate(360deg); } }
+.anim-fall { animation: fall linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes oven-glow { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+.anim-glow { animation: oven-glow 1.2s ease-in-out infinite; }
+@keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.anim-wiggle { animation: wiggle .5s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
+@keyframes cook-bubble { 0%, 100% { transform: scale(.2); opacity: 0; } 50% { transform: scale(1); opacity: .8; } }
+.anim-cook-bubble { animation: cook-bubble 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-bubble, .anim-float, .anim-twinkle, .anim-swirl, .anim-steam, .anim-fall, .anim-glow, .anim-wiggle, .anim-cook-bubble { animation: none !important; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}
+.reduce-motion .anim-bubble, .reduce-motion .anim-float, .reduce-motion .anim-twinkle, .reduce-motion .anim-swirl,
+.reduce-motion .anim-steam, .reduce-motion .anim-fall, .reduce-motion .anim-glow, .reduce-motion .anim-wiggle, .reduce-motion .anim-cook-bubble { animation: none !important; }
