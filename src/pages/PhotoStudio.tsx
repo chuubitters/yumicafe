@@ -22,6 +22,7 @@ import { downloadBlob, uid } from '../utils/misc';
 import { sfx } from '../utils/sound';
 import { toast } from '../store/toastStore';
 import { ModeFrame, TitleBlock, Stamp } from '../components/common/PosterTitle';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 interface Project {
   template: string;
@@ -45,7 +46,7 @@ function presetItems(t: string, w: number, h: number): Partial<Project> {
   const S = (ref: string, x: number, y: number, size: number, extra: Partial<StageItem> = {}): StageItem => ({ ...(makeItem({ type: 'sprite', ref }, x, y, size) as StageItem), ...extra });
   if (t === 'scrapbook') return { bg: 'kraft', frame: 'none', items: [S('washi-pink', w * 0.3, h * 0.12, 260, { rotation: -8 }), S('washi-green', w * 0.72, h * 0.86, 260, { rotation: 6 }), T('my sweet diary', w / 2, h * 0.2, 70, { font: 'body', color: '#C9566F' }), S('sakura', w * 0.85, h * 0.18, 110), S('heart', w * 0.14, h * 0.82, 100)] };
   if (t === 'menu') return { bg: 'matcha', frame: 'menu', items: [S('tag-limited', w * 0.13, h * 0.3, 380), T('Sweets Fair', w / 2, h * 0.12, 90, { color: '#4F6B3A' }), S('tag-price', w * 0.78, h * 0.78, 220), S('tag-new', w * 0.85, h * 0.26, 150)] };
-  if (t === 'story') return { bg: 'sky', frame: 'none', items: [T('today’s café ♡', w / 2, h * 0.1, 90), S('cloud', w * 0.2, h * 0.2, 200), S('sparkle', w * 0.82, h * 0.86, 120)] };
+  if (t === 'story') return { bg: 'sky', frame: 'none', items: [T('today’s café', w / 2, h * 0.1, 90), S('cloud', w * 0.2, h * 0.2, 200), S('sparkle', w * 0.82, h * 0.86, 120)] };
   return { items: [] };
 }
 
@@ -251,13 +252,13 @@ export default function PhotoStudio() {
           )}
           {tab === 'bg' && (
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-3 gap-2">
+              <div className="tile-grid">
                 {PHOTO_BACKGROUNDS.map((b) => {
                   const locked = !!b.lock && !isUnlocked(b.lock);
                   return (
                     <button key={b.id} disabled={locked} onClick={() => h.set({ ...p, bg: b.id })} className={`tile ${p.bg === b.id ? 'tile-on' : ''} ${locked ? 'tile-locked' : ''}`}>
                       <span className="h-9 w-12 rounded-lg border-2 border-white shadow" style={{ background: `linear-gradient(${b.color}, ${b.color2})` }} />
-                      <span className="text-[10px]">{b.name}{locked ? ' 🔒' : ''}</span>
+                      <span className="text-[10px]">{b.name}{locked && <Glyph name="lock" className="ml-0.5" />}</span>
                     </button>
                   );
                 })}
@@ -266,7 +267,7 @@ export default function PhotoStudio() {
             </div>
           )}
           {tab === 'frame' && (
-            <div className="grid grid-cols-3 gap-2">
+            <div className="tile-grid">
               {FRAMES.map((f) => <button key={f} onClick={() => h.set({ ...p, frame: f })} className={`tile capitalize ${p.frame === f ? 'tile-on' : ''}`}><Frame size={20} />{f}</button>)}
             </div>
           )}

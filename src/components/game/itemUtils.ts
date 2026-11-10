@@ -29,7 +29,7 @@ export function makeItem(p: DragPayload, x: number, y: number, size = 80): Stage
     return { ...base, kind: 'creation', ref: p.ref, w, h };
   }
   if (p.type === 'text') {
-    const text = p.data?.text || 'Sweet day ♡';
+    const text = p.data?.text || 'Sweet day';
     const h = size * 0.4;
     return { ...base, kind: 'text', ref: 'text', text, w: Math.max(h, text.length * h * 0.62), h, color: p.data?.color || '#5E4535', font: p.data?.font || 'display', stroke: '#FFFFFF', shadow: true };
   }

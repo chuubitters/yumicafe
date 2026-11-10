@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Redo2, Undo2, Check } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
+import { ChevronLeft, ChevronRight, Redo2, Undo2, Check, Expand, Shrink } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { sfx } from '../../utils/sound';
 import { ModeFrame, PosterTitle, type ModeId } from '../common/PosterTitle';
+import { Glyph, type GlyphName } from '../common/Glyph';
 
 export interface StepDef { id: string; label: string; jp?: string }
 
@@ -28,8 +29,12 @@ interface Props {
   stageHint?: ReactNode;
 }
 
+/** ⌘ on Apple devices, Ctrl elsewhere — used in tooltips */
+export const MOD = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘' : 'Ctrl';
+
 export function StudioShell({ title, jp, subtitle, mode, steps, step, setStep, canNext = true, nextHint, stage, stageFooter, panel, headerRight, onFinish, finishLabel = 'Finish!', undo, stageTools, stageHint }: Props) {
   const last = step === steps.length - 1;
+  const [compact, setCompact] = useState(false);
   useEffect(() => {
     if (!undo) return;
     const k = (e: KeyboardEvent) => {
@@ -64,25 +69,28 @@ export function StudioShell({ title, jp, subtitle, mode, steps, step, setStep, c
         ))}
       </nav>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_440px]">
-        {/* stage */}
-        <section className="studio-stage relative flex min-w-0 flex-col gap-2">
-          <div className="flex min-h-[40px] items-center gap-2">
-            <div className="min-w-0 flex-1">{stageHint}</div>
-            {stageTools}
-            {undo && (
-              <>
-                <button className="btn-icon !h-9 !w-9" onClick={() => { sfx('undo'); undo.undo(); }} disabled={!undo.canUndo} aria-label="Undo" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
-                <button className="btn-icon !h-9 !w-9" onClick={() => { sfx('redo'); undo.redo(); }} disabled={!undo.canRedo} aria-label="Redo" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
-              </>
-            )}
+      <div className="studio-grid grid gap-3 lg:gap-4 lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_440px]">
+        {/* stage: on phones/tablets the whole block (tools row + canvas) is a direct grid child so it can stay pinned while the panel scrolls */}
+        <section className={`studio-stage ${compact ? 'studio-compact' : ''} contents lg:relative lg:flex lg:min-w-0 lg:flex-col lg:gap-2`}>
+          <div className="studio-stage-sticky flex min-w-0 flex-col gap-1.5">
+            <div className="flex min-h-[40px] items-center gap-2 px-0.5">
+              <div className="min-w-0 flex-1">{stageHint}</div>
+              {stageTools}
+              <button className="btn-icon !h-9 !w-9 lg:hidden" onClick={() => { sfx('tab'); setCompact((c) => !c); }} aria-pressed={compact} aria-label={compact ? 'Enlarge preview' : 'Shrink preview'} title={compact ? 'Enlarge preview' : 'Shrink preview to see more options'}>{compact ? <Expand size={16} /> : <Shrink size={16} />}</button>
+              {undo && (
+                <>
+                  <button className="btn-icon !h-9 !w-9" onClick={() => { sfx('undo'); undo.undo(); }} disabled={!undo.canUndo} aria-label="Undo" title={`Undo (${MOD}+Z)`}><Undo2 size={16} /></button>
+                  <button className="btn-icon !h-9 !w-9" onClick={() => { sfx('redo'); undo.redo(); }} disabled={!undo.canRedo} aria-label="Redo" title={`Redo (${MOD}+Shift+Z)`}><Redo2 size={16} /></button>
+                </>
+              )}
+            </div>
+            {stage}
           </div>
-          <div className="studio-stage-sticky -mx-1 rounded-[30px] bg-cream/80 px-1 pb-1 backdrop-blur lg:bg-transparent lg:p-0 lg:backdrop-blur-none">{stage}</div>
           {stageFooter}
         </section>
 
         {/* panel */}
-        <aside className="paper stitch relative flex min-w-0 flex-col gap-3 p-4 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start">
+        <aside className="studio-panel paper stitch relative flex min-w-0 flex-col gap-3 p-3 sm:p-4 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start">
           <div className="flex items-center gap-2">
             <motion.span key={step} initial={{ scale: 0.3, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 14 }} className="badge-round h-9 w-9 shrink-0 aspect-square text-sm font-display">{step + 1}</motion.span>
             <div>
@@ -112,7 +120,7 @@ export function StudioShell({ title, jp, subtitle, mode, steps, step, setStep, c
   );
 }
 
-export function OptionGrid<T extends { id: string; name: string }>({ options, value, onPick, render, cols = 'grid-cols-3 sm:grid-cols-4 lg:grid-cols-3', isLocked, recommended }: {
+export function OptionGrid<T extends { id: string; name: string }>({ options, value, onPick, render, cols = 'tile-grid', isLocked, recommended }: {
   options: T[]; value: string | string[] | null; onPick: (o: T) => void; render?: (o: T) => ReactNode; cols?: string; isLocked?: (o: T) => boolean; recommended?: string | string[] | null;
 }) {
   const on = (id: string) => (Array.isArray(value) ? value.includes(id) : value === id);
@@ -126,7 +134,7 @@ export function OptionGrid<T extends { id: string; name: string }>({ options, va
             {rec(o.id) && <span className="pill-label absolute -top-2 left-1/2 -translate-x-1/2 !bg-none !bg-kiss-green !px-2 !py-0 !text-[9px]">レシピ</span>}
             {render?.(o)}
             <span className="text-center leading-tight">{o.name}</span>
-            {locked && <span className="text-[9px] text-cocoa">🔒 Shop</span>}
+            {locked && <span className="inline-flex items-center gap-0.5 text-[9px] text-cocoa"><Glyph name="lock" />Shop</span>}
           </button>
         );
       })}

@@ -370,7 +370,7 @@ export function PictureFrame({ c = '#C8925E' }: { c?: string }) {
   );
 }
 
-export function MenuBoard({ text = 'Today’s special ♡' }: { text?: string }) {
+export function MenuBoard({ text = 'Today’s special' }: { text?: string }) {
   return (
     <g>
       <rect x="-100" y="-80" width="200" height="160" rx="8" fill="url(#yc-wood)" />
@@ -429,7 +429,7 @@ export function Rug({ c = '#F7B8C8' }: { c?: string }) {
 }
 
 /* ---------- exterior ---------- */
-export function ASign({ text = 'OPEN ♡' }: { text?: string }) {
+export function ASign({ text = 'OPEN' }: { text?: string }) {
   return (
     <g>
       <ellipse cy="96" rx="60" ry="7" fill="url(#yc-floor-shadow)" />

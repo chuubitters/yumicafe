@@ -7,6 +7,7 @@ import { useSettings } from '../../store/settingsStore';
 import { sfx } from '../../utils/sound';
 import { SettingsModal } from '../../pages/SettingsModal';
 import { PetalLayer } from '../common/PetalLayer';
+import { Glyph } from '../common/Glyph';
 
 export const NAV = [
   { to: '/', label: 'Home', jp: 'ホーム', icon: Home, color: '#F7B8C8' },
@@ -120,7 +121,7 @@ export function MainLayout() {
         <header className="sticky top-0 z-40 flex items-center gap-2 border-b-2 border-dotted border-strawberry/60 bg-cream/90 px-3 py-2 backdrop-blur md:px-5">
           <button className="md:hidden" onClick={() => nav('/')} aria-label="Home"><Logo small /></button>
           <div className="hidden min-w-0 md:block">
-            <p className="truncate text-sm font-bold text-cocoa"><span className="ribbon !py-0.5 !text-xs">いらっしゃいませ</span> <span className="text-strawberry-dark">{player?.name || 'Yumi'}</span> <span className="anim-twinkle inline-block text-strawberry-deep">♡</span></p>
+            <p className="truncate text-sm font-bold text-cocoa"><span className="ribbon !py-0.5 !text-xs">いらっしゃいませ</span> <span className="text-strawberry-dark">{player?.name || 'Yumi'}</span> <Glyph name="heart" size={14} className="anim-twinkle" /></p>
           </div>
           <div className="flex-1" />
           <StarBar />

@@ -10,14 +10,15 @@ import { openImageLibrary } from './ImageLibrary';
 import type { StageItem } from '../../types';
 import { SPRITES } from '../../art/sprites';
 import { Link } from 'react-router-dom';
+import { Glyph, type GlyphName } from '../common/Glyph';
 
-export function TrayTile({ payload, preview, onAdd, label, locked, active, size = 'md' }: { payload: DragPayload; preview: ReactNode; onAdd: (p: DragPayload) => void; label?: string; locked?: boolean; active?: boolean; size?: 'sm' | 'md' }) {
+export function TrayTile({ payload, preview, onAdd, label, locked, active, size = 'md', fluid }: { fluid?: boolean; payload: DragPayload; preview: ReactNode; onAdd: (p: DragPayload) => void; label?: string; locked?: boolean; active?: boolean; size?: 'sm' | 'md' }) {
   const h = useTrayDrag(payload, preview, () => onAdd(payload), locked);
   return (
     <button {...h} type="button" disabled={locked} title={label}
-      className={`tile shrink-0 ${size === 'sm' ? 'min-h-[76px] w-full min-w-[64px]' : 'min-h-[76px] w-[76px]'} ${locked ? 'tile-locked' : ''} ${active ? 'tile-on' : ''}`}>
+      className={`tile shrink-0 ${size === 'sm' ? 'min-h-[76px] w-full min-w-[64px]' : fluid ? 'min-h-[76px] w-full min-w-[78px]' : 'min-h-[76px] w-[76px]'} ${locked ? 'tile-locked' : ''} ${active ? 'tile-on' : ''}`}>
       <span className="pointer-events-none grid flex-1 place-items-center">{preview}</span>
-      {label && <span className="pointer-events-none line-clamp-2 w-full break-words text-center text-[10px] leading-tight">{label}</span>}
+      {label && <span className="pointer-events-none line-clamp-2 w-full text-center text-[10px] leading-tight [overflow-wrap:normal]">{label}</span>}
       {locked && <Lock size={14} className="absolute right-1 top-1 text-cocoa" />}
     </button>
   );
@@ -41,7 +42,7 @@ export function DecorPanel({ onAdd, extraTabs = [], showCreations, groups, items
   const creations = useCollection((s) => s.creations);
   const previews = useCollection((s) => s.previews);
   const isUnlocked = useUnlocked();
-  const [text, setText] = useState('Sweet day ♡');
+  const [text, setText] = useState('Sweet day');
 
   const tabs = [
     ...extraTabs.map((t) => ({ id: t.id, label: t.label, icon: t.icon })),
@@ -66,7 +67,7 @@ export function DecorPanel({ onAdd, extraTabs = [], showCreations, groups, items
           <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
             {visibleGroups.map((g) => (
               <button key={g.id} onClick={() => setGroup(g.id)} className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-bold ${group === g.id ? 'bg-cocoa text-white' : 'bg-white/70 text-cocoa'}`}>
-                {g.name}{g.lock && !isUnlocked(g.lock) ? ' 🔒' : ''}
+                {g.name}{g.lock && !isUnlocked(g.lock) && <Glyph name="lock" className="ml-0.5" />}
               </button>
             ))}
           </div>
@@ -75,9 +76,9 @@ export function DecorPanel({ onAdd, extraTabs = [], showCreations, groups, items
             const locked = !!g.lock && !isUnlocked(g.lock);
             return (
               <>
-                <div className="scroll-x lg:grid lg:grid-cols-4 lg:overflow-visible">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(78px,1fr))] gap-2">
                   {g.items.map((s) => (
-                    <TrayTile key={s} payload={{ type: 'sprite', ref: s }} preview={<SpriteThumb id={s} size={42} />} label={SPRITES[s]?.name} onAdd={onAdd} locked={locked} />
+                    <TrayTile fluid key={s} payload={{ type: 'sprite', ref: s }} preview={<SpriteThumb id={s} size={42} />} label={SPRITES[s]?.name} onAdd={onAdd} locked={locked} />
                   ))}
                 </div>
                 {locked && <Link to="/shop" className="text-center text-xs font-bold text-strawberry-deep underline">Unlock “{g.name}” in the Shop</Link>}
@@ -92,9 +93,9 @@ export function DecorPanel({ onAdd, extraTabs = [], showCreations, groups, items
           <button className="btn-pink w-full" onClick={async () => { const id = await openImageLibrary('Add a photo decoration'); if (id) onAdd({ type: 'image', ref: id }); }}>
             <ImagePlus size={16} /> Upload / choose image
           </button>
-          <div className="scroll-x lg:grid lg:grid-cols-4 lg:overflow-visible">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(78px,1fr))] gap-2">
             {assets.map((a) => (
-              <TrayTile key={a.id} payload={{ type: 'image', ref: a.id }} onAdd={onAdd} preview={<img src={urls[a.id]} alt="" className="h-12 w-12 rounded-lg object-cover" draggable={false} />} />
+              <TrayTile fluid key={a.id} payload={{ type: 'image', ref: a.id }} onAdd={onAdd} preview={<img src={urls[a.id]} alt="" className="h-12 w-12 rounded-lg object-cover" draggable={false} />} />
             ))}
           </div>
           {!assets.length && <p className="text-xs text-cocoa">Your uploaded images appear here and can be reused everywhere.</p>}
@@ -109,16 +110,16 @@ export function DecorPanel({ onAdd, extraTabs = [], showCreations, groups, items
             <button className="btn-butter btn-sm" onClick={() => onAdd({ type: 'text', ref: 'text', data: { text, font: 'body', color: '#C9566F' } })}>+ Round text</button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {['期間限定', 'おいしい♡', 'いちごミルク', 'NEW!', 'Sweet day ♡', '¥480'].map((t) => (
+            {['期間限定', 'おいしい', 'いちごミルク', 'NEW!', 'Sweet day', '¥480'].map((t) => (
               <button key={t} className="chip" onClick={() => onAdd({ type: 'text', ref: 'text', data: { text: t, font: /[a-z]/i.test(t) ? 'display' : 'jp' } })}>{t}</button>
             ))}
           </div>
         </div>
       )}
       {tab === 'creations' && (
-        <div className="scroll-x lg:grid lg:grid-cols-3 lg:overflow-visible">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(78px,1fr))] gap-2">
           {creations.filter((c) => c.type !== 'cafe').map((c) => (
-            <TrayTile key={c.id} payload={{ type: 'creation', ref: c.id }} onAdd={onAdd} label={c.name} preview={previews[c.id] ? <img src={previews[c.id]} alt="" className="h-12 w-12 object-contain" draggable={false} /> : <span>🍨</span>} />
+            <TrayTile fluid key={c.id} payload={{ type: 'creation', ref: c.id }} onAdd={onAdd} label={c.name} preview={previews[c.id] ? <img src={previews[c.id]} alt="" className="h-12 w-12 object-contain" draggable={false} /> : <Glyph name="icecream" size={34} />} />
           ))}
           {!creations.length && <p className="text-xs text-cocoa">Make desserts in the kitchens — they’ll show up here.</p>}
         </div>

@@ -21,6 +21,7 @@ import type { DragPayload } from '../components/game/dnd';
 import { sfx } from '../utils/sound';
 import { clamp } from '../utils/misc';
 import { useAssets } from '../store/assetStore';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 const STEPS = [
   { id: 'batter', label: 'Choose batter', jp: '生地' },
@@ -158,9 +159,9 @@ export default function CrepeKitchen() {
     return <g key={d.fold}><CrepeArt d={d} animate /></g>;
   })();
 
-  const fillTile = (o: { id: string; name: string; color?: string }, emoji?: string) => (
+  const fillTile = (o: { id: string; name: string; color?: string }, glyph?: GlyphName) => (
     <button key={o.id} onClick={() => { set({ fillings: toggle(d.fillings, o.id) }); sfx(o.id.startsWith('cream') ? 'pipe' : 'drop'); }} className={`tile ${d.fillings.includes(o.id) ? 'tile-on' : ''}`}>
-      {emoji ? <span className="text-xl">{emoji}</span> : <Swatch c={o.color || '#fff'} />}
+      {glyph ? <Glyph name={glyph} size={28} /> : <Swatch c={o.color || '#fff'} />}
       <span className="text-[10px]">{o.name}</span>
     </button>
   );
@@ -178,10 +179,10 @@ export default function CrepeKitchen() {
         return (
           <div className="flex flex-col gap-3">
             <ol className="flex flex-col gap-2 text-xs font-bold">
-              <li className={`rounded-2xl px-3 py-2 ${radius >= 60 ? 'bg-matcha/50 text-matcha-dark' : 'bg-strawberry/40'}`}>1. Press & hold on the pan to pour batter {radius >= 60 && '✓'}</li>
-              <li className={`rounded-2xl px-3 py-2 ${radius >= 150 ? 'bg-matcha/50 text-matcha-dark' : radius >= 60 ? 'bg-strawberry/40' : 'bg-white/70'}`}>2. Drag in circles with the spreader {radius >= 150 && '✓'}</li>
-              <li className={`rounded-2xl px-3 py-2 ${d.flipped ? 'bg-matcha/50 text-matcha-dark' : radius >= 150 ? 'bg-strawberry/40' : 'bg-white/70'}`}>3. Watch the bubbles, then flip {d.flipped && '✓'}</li>
-              <li className={`rounded-2xl px-3 py-2 ${cookDone ? 'bg-matcha/50 text-matcha-dark' : 'bg-white/70'}`}>4. Cook until golden {cookDone && '✓'}</li>
+              <li className={`rounded-2xl px-3 py-2 ${radius >= 60 ? 'bg-matcha/50 text-matcha-dark' : 'bg-strawberry/40'}`}>1. Press & hold on the pan to pour batter {radius >= 60 && <Glyph name="check" className="ml-1" />}</li>
+              <li className={`rounded-2xl px-3 py-2 ${radius >= 150 ? 'bg-matcha/50 text-matcha-dark' : radius >= 60 ? 'bg-strawberry/40' : 'bg-white/70'}`}>2. Drag in circles with the spreader {radius >= 150 && <Glyph name="check" className="ml-1" />}</li>
+              <li className={`rounded-2xl px-3 py-2 ${d.flipped ? 'bg-matcha/50 text-matcha-dark' : radius >= 150 ? 'bg-strawberry/40' : 'bg-white/70'}`}>3. Watch the bubbles, then flip {d.flipped && <Glyph name="check" className="ml-1" />}</li>
+              <li className={`rounded-2xl px-3 py-2 ${cookDone ? 'bg-matcha/50 text-matcha-dark' : 'bg-white/70'}`}>4. Cook until golden {cookDone && <Glyph name="check" className="ml-1" />}</li>
             </ol>
             <div className="h-3 overflow-hidden rounded-full bg-cream"><motion.div className="h-full rounded-full bg-gradient-to-r from-butter to-[#D99A4C]" animate={{ width: `${d.cookLevel * 100}%` }} /></div>
             <div className="grid grid-cols-2 gap-2">
@@ -190,18 +191,18 @@ export default function CrepeKitchen() {
               <button className="btn-deep col-span-2" disabled={d.flipped || d.cookLevel < 0.55} onClick={flip}><FlipVertical2 size={16} />Flip the crêpe!</button>
               <button className="btn-cream col-span-2 btn-sm" onClick={resetCook}><RefreshCw size={14} />Start over</button>
             </div>
-            {cookDone && <div className="rounded-2xl bg-matcha/40 p-2 text-center text-sm font-bold text-matcha-dark">Perfectly golden! ✿</div>}
+            {cookDone && <div className="rounded-2xl bg-matcha/40 p-2 text-center text-sm font-bold text-matcha-dark">Perfectly golden!</div>}
           </div>
         );
       case 2:
         return (
           <div className="flex flex-col gap-3">
             <h3 className="text-xs font-bold">Cream</h3>
-            <div className="grid grid-cols-4 gap-2">{CREPE_CREAMS.map((o) => fillTile(o))}</div>
+            <div className="tile-grid">{CREPE_CREAMS.map((o) => fillTile(o))}</div>
             <h3 className="text-xs font-bold">Fruit</h3>
-            <div className="grid grid-cols-4 gap-2">{CREPE_FRUITS.map((o) => fillTile(o, { 'fruit-strawberry': '🍓', 'fruit-banana': '🍌', 'fruit-kiwi': '🥝', 'fruit-peach': '🍑' }[o.id]))}</div>
+            <div className="tile-grid">{CREPE_FRUITS.map((o) => fillTile(o, ({ 'fruit-strawberry': 'strawberry', 'fruit-banana': 'banana', 'fruit-kiwi': 'kiwi', 'fruit-peach': 'peach' } as Record<string, GlyphName>)[o.id]))}</div>
             <h3 className="text-xs font-bold">Extras</h3>
-            <div className="grid grid-cols-3 gap-2">{CREPE_OTHERS.map((o) => fillTile(o, { custard: '🍮', brownie: '🟫', pudding: '🍮', mochi: '🍡', crumbs: '🍪', cheesecake: '🧀' }[o.id]))}</div>
+            <div className="tile-grid">{CREPE_OTHERS.map((o) => fillTile(o, ({ custard: 'pudding', brownie: 'brownie', pudding: 'pudding', mochi: 'dango', crumbs: 'crumbs', cheesecake: 'cheese' } as Record<string, GlyphName>)[o.id]))}</div>
           </div>
         );
       case 3:
@@ -214,7 +215,7 @@ export default function CrepeKitchen() {
             <h3 className="text-xs font-bold">Toppings</h3>
             <div className="grid grid-cols-2 gap-2">{CREPE_TOPPINGS.map((o) => (
               <button key={o.id} className={`tile ${d.toppings.includes(o.id) ? 'tile-on' : ''}`} onClick={() => { set({ toppings: toggle(d.toppings, o.id) }); sfx('pop'); }}>
-                <span className="text-xl">{{ whipped: '🍦', sprinkles: '✨', cherries: '🍒', minicookies: '🍪' }[o.id]}</span>{o.name}
+                <Glyph name={({ whipped: 'cream', sprinkles: 'sprinkles', cherries: 'cherry', minicookies: 'cookie' } as Record<string, GlyphName>)[o.id] || 'sparkle'} size={26} />{o.name}
               </button>
             ))}</div>
           </div>
@@ -222,7 +223,7 @@ export default function CrepeKitchen() {
       case 4:
         return (
           <div className="flex flex-col gap-3">
-            <OptionGrid options={FOLDS} value={d.fold} cols="grid-cols-3" onPick={(o) => { set({ fold: o.id as CrepeData['fold'] }); sfx('flip'); }}
+            <OptionGrid options={FOLDS} value={d.fold} cols="tile-grid" onPick={(o) => { set({ fold: o.id as CrepeData['fold'] }); sfx('flip'); }}
               render={(o) => <svg viewBox={o.id === 'cone' ? '60 100 290 430' : '0 220 400 260'} className="h-16 w-14"><ArtDefs /><CrepeArt d={{ ...sampleCrepe(), batter: d.batter, fold: o.id as CrepeData['fold'] }} /></svg>} />
             <p className="text-xs text-cocoa">The Japanese cone is the classic Harajuku street style — wrapped in paper so you can walk and eat!</p>
           </div>
@@ -234,7 +235,7 @@ export default function CrepeKitchen() {
               id: 'wrap', label: 'Wrapper', icon: <Sparkles size={14} />, content: (
                 <div className="flex flex-col gap-3">
                   {d.fold !== 'cone' && <p className="rounded-xl bg-butter/60 px-3 py-2 text-xs font-bold">Wrappers show on cone crêpes — switch the fold to “Japanese cone” to see them.</p>}
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="tile-grid">
                     {WRAPPERS.map((w) => (
                       <button key={w.id} className={`tile ${d.wrapper === w.id ? 'tile-on' : ''}`} onClick={async () => {
                         if (w.id === 'custom') { const id = await openImageLibrary('Custom crêpe wrapper'); if (id) set({ wrapper: 'custom', wrapperAsset: id }); }
@@ -265,7 +266,7 @@ export default function CrepeKitchen() {
         stageHint={step === 1 ? <span className="chip">{nextHint}</span> : null}
         stageTools={<BgPicker value={st.bg || 'bg-peko'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setResult(true); }}
-        finishLabel="Finish crêpe ✿"
+        finishLabel="Finish crêpe"
         stage={
           <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-peko'} maxHeight="var(--stage-max-h)"
             onDrop={onDrop} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} cursor={step === 1 ? 'crosshair' : undefined} ariaLabel="Your crêpe">

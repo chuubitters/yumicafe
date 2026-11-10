@@ -172,7 +172,10 @@ export async function creationCard(previewUrl: string, name: string, type: strin
   c.fillText(fit(c, ingredients.slice(0, 6).join(' ・ '), 860), W / 2, 1185);
   c.font = '600 26px Mali, sans-serif';
   c.fillStyle = t.accent;
-  c.fillText('♡ made with love at my little Japanese café ♡', W / 2, 1232);
+  const line = 'made with love at my little Japanese café';
+  c.fillText(line, W / 2, 1232);
+  const half = c.measureText(line).width / 2 + 34;
+  for (const dx of [-half, half]) drawHeart(c, W / 2 + dx, 1222, 13, t.accent);
   return new Promise((res, rej) => cv.toBlob((b) => (b ? res(b) : rej(new Error('fail'))), 'image/png'));
 }
 
@@ -190,4 +193,16 @@ function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number,
   c.arcTo(x, y + h, x, y, r);
   c.arcTo(x, y, x + w, y, r);
   c.closePath();
+}
+
+/** vector heart drawn straight on the canvas (no emoji / font glyph needed) */
+function drawHeart(c: CanvasRenderingContext2D, cx: number, cy: number, r: number, color: string) {
+  c.save();
+  c.fillStyle = color;
+  c.beginPath();
+  c.moveTo(cx, cy + r * 0.95);
+  c.bezierCurveTo(cx - r * 1.9, cy - r * 0.2, cx - r * 0.9, cy - r * 1.4, cx, cy - r * 0.45);
+  c.bezierCurveTo(cx + r * 0.9, cy - r * 1.4, cx + r * 1.9, cy - r * 0.2, cx, cy + r * 0.95);
+  c.fill();
+  c.restore();
 }

@@ -12,6 +12,7 @@ import { useCafe } from '../../store/cafeStore';
 import { toast } from '../../store/toastStore';
 import { downloadBlob, safeName } from '../../utils/misc';
 import { sfx } from '../../utils/sound';
+import { Glyph, type GlyphName } from '../common/Glyph';
 
 interface Props {
   open: boolean;
@@ -81,7 +82,7 @@ export function ResultModal({ open, onClose, svgRef, size, type, defaultName, in
           g.bump('recipes');
           setTimeout(() => g.earn(10, 'Perfect recipe bonus'), 600);
         }
-      } else toast('Creation updated ✿', 'success');
+      } else toast('Creation updated', 'success');
       onSaved?.(c);
     } finally {
       setBusy(false);
@@ -106,7 +107,7 @@ export function ResultModal({ open, onClose, svgRef, size, type, defaultName, in
             <div className="absolute inset-2 rounded-[22px] border-2 border-dashed border-white/80" />
           </div>
           <motion.div initial={{ scale: 3, opacity: 0, rotate: -30 }} animate={{ scale: 1, opacity: 1, rotate: -12 }} transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 14 }}
-            className="badge-round absolute right-3 top-3 z-10 h-[62px] w-[62px] shrink-0 aspect-square text-[11px]" aria-hidden>{saved ? <>保存<br />ずみ</> : <>できた<br />♡</>}</motion.div>
+            className="badge-round absolute right-3 top-3 z-10 h-[62px] w-[62px] shrink-0 aspect-square text-[11px]" aria-hidden>{saved ? <>保存<br />ずみ</> : <>できた<br /><Glyph name="heart" size={12} /></>}</motion.div>
           {preview ? (
             <motion.img key={preview.url} src={preview.url} alt="Your creation" className="relative max-h-[46vh] w-auto drop-shadow-xl" initial={{ scale: 0.6, rotate: -6, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 160, damping: 12 }} />
           ) : (
@@ -121,7 +122,7 @@ export function ResultModal({ open, onClose, svgRef, size, type, defaultName, in
           {ingredients.length > 0 && (
             <div className="flex flex-wrap gap-1.5">{ingredients.slice(0, 12).map((i) => <span key={i} className="chip">{i}</span>)}</div>
           )}
-          {isRecipe && <div className="rounded-2xl bg-matcha/40 px-3 py-2 text-xs font-bold text-matcha-dark">✓ Followed the recipe perfectly — bonus stars!</div>}
+          {isRecipe && <div className="rounded-2xl bg-matcha/40 px-3 py-2 text-xs font-bold text-matcha-dark"><Glyph name="check" className="mr-1" />Followed the recipe perfectly — bonus stars!</div>}
           {!saved ? (
             <div className="flex flex-wrap gap-2">
               <button className="btn-deep flex-1" disabled={!preview || busy} onClick={() => doSave(false)}><Heart size={16} />{editingId ? 'Update creation' : 'Save to collection'}</button>
@@ -130,7 +131,7 @@ export function ResultModal({ open, onClose, svgRef, size, type, defaultName, in
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {type !== 'cafe' && <button className="btn-matcha" onClick={() => { useCafe.getState().addDisplay(saved.id, saved.previewW, saved.previewH); toast('Displayed in your café ✿', 'success'); nav('/cafe'); }}><Store size={16} />Display in café</button>}
+              {type !== 'cafe' && <button className="btn-matcha" onClick={() => { useCafe.getState().addDisplay(saved.id, saved.previewW, saved.previewH); toast('Displayed in your café', 'success'); nav('/cafe'); }}><Store size={16} />Display in café</button>}
               <button className="btn-sky" onClick={() => nav(`/photo?creation=${saved.id}`)}><Camera size={16} />Photo Studio</button>
               <button className="btn-butter" onClick={exportCard}><Download size={16} />Export card PNG</button>
               <button className="btn-cream" onClick={() => { if (preview) { downloadBlob(preview.blob, `${safeName(name)}.png`); sfx('shutter'); } }}><Download size={16} />Transparent PNG</button>

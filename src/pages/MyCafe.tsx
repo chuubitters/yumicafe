@@ -21,6 +21,7 @@ import { confirmDialog } from '../components/common/ConfirmDialog';
 import { cafeItemRender } from './Home';
 import { defaultCafe } from '../store/cafeStore';
 import { ModeFrame, TitleBlock, Stamp } from '../components/common/PosterTitle';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 export default function MyCafe() {
   const stored = useCafe((s) => s.layout);
@@ -141,10 +142,10 @@ export default function MyCafe() {
               <h3 className="font-display text-sm">My Dessert Showcase</h3>
               <p className="text-[11px] text-cocoa">Place the real drinks, parfaits, crêpes and cookies you made — on the counter, in the showcase or on tables.</p>
               {showcase.length ? (
-                <div className="grid grid-cols-3 gap-2">
+                <div className="tile-grid">
                   {showcase.map((c) => (
                     <TrayTile key={c.id} payload={{ type: 'creation', ref: c.id }} onAdd={addAt} label={c.name}
-                      preview={previews[c.id] ? <img src={previews[c.id]} alt="" className="h-11 w-11 object-contain" draggable={false} /> : <span>🍰</span>} />
+                      preview={previews[c.id] ? <img src={previews[c.id]} alt="" className="h-11 w-11 object-contain" draggable={false} /> : <Glyph name="cake" size={34} />} />
                   ))}
                 </div>
               ) : <p className="rounded-2xl bg-cream p-3 text-center text-xs">Nothing yet — <Link to="/drink" className="font-bold text-strawberry-deep underline">make a drink</Link> and it can be displayed here.</p>}
@@ -153,7 +154,7 @@ export default function MyCafe() {
             <DecorPanel onAdd={addAt} items={scene.items} selectedId={sel} onSelect={setSel} />
           ) : (
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-3 gap-2">
+              <div className="tile-grid">
                 {furniture.map((f) => {
                   const locked = !!f.lock && !isUnlocked(f.lock);
                   return <TrayTile key={f.id} payload={{ type: 'sprite', ref: f.id }} onAdd={addAt} label={f.name} locked={locked} preview={<SpriteThumb id={f.id} size={44} />} />;
@@ -164,25 +165,25 @@ export default function MyCafe() {
               {area === 'wall' && (
                 <>
                   <h3 className="text-xs font-bold">Wallpaper</h3>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="tile-grid">
                     {WALLPAPERS.map((w) => {
                       const locked = w.id === 'shoji' && !isUnlocked('wall:shoji');
                       return (
                         <button key={w.id} disabled={locked} onClick={() => { h.set({ ...L, interior: { ...L.interior, wallpaper: w.id } }); sfx('pop'); }} className={`tile ${L.interior.wallpaper === w.id ? 'tile-on' : ''} ${locked ? 'tile-locked' : ''}`}>
                           <span className="h-8 w-12 rounded-lg border-2 border-white shadow" style={{ background: `repeating-linear-gradient(90deg, ${w.color} 0 8px, ${w.color2} 8px 16px)` }} />
-                          <span className="text-[10px]">{w.name}{locked ? ' 🔒' : ''}</span>
+                          <span className="text-[10px]">{w.name}{locked && <Glyph name="lock" className="ml-0.5" />}</span>
                         </button>
                       );
                     })}
                   </div>
                   <h3 className="text-xs font-bold">Floor</h3>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="tile-grid">
                     {FLOORS.map((f) => {
                       const locked = f.id === 'tatami' && !isUnlocked('floor:tatami');
                       return (
                         <button key={f.id} disabled={locked} onClick={() => { h.set({ ...L, interior: { ...L.interior, floor: f.id } }); sfx('pop'); }} className={`tile ${L.interior.floor === f.id ? 'tile-on' : ''} ${locked ? 'tile-locked' : ''}`}>
                           <span className="h-8 w-12 rounded-lg border-2 border-white shadow" style={{ background: `repeating-conic-gradient(${f.color} 0 25%, ${f.color2} 0 50%) 0 0/16px 16px` }} />
-                          <span className="text-[10px]">{f.name}{locked ? ' 🔒' : ''}</span>
+                          <span className="text-[10px]">{f.name}{locked && <Glyph name="lock" className="ml-0.5" />}</span>
                         </button>
                       );
                     })}

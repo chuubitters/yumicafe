@@ -101,7 +101,7 @@ export function ImageLibraryHost() {
       const id = await add(blob, cropSrc.name || 'my image', w, h);
       useGame.getState().bump('uploads');
       sfx('pop');
-      toast('Saved to your Image Library ✿', 'success');
+      toast('Saved to your Image Library', 'success');
       close(id);
     } catch (e) {
       console.error(e);

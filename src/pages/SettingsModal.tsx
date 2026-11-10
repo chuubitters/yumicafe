@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Download, Music, RotateCcw, Upload, Volume2 } from 'lucide-react';
+import { MOD } from '../components/game/StudioShell';
 import { Modal } from '../components/common/Modal';
 import { useSettings } from '../store/settingsStore';
 import { useGame } from '../store/gameStore';
@@ -7,6 +8,7 @@ import { exportSave, importSave, resetAll } from '../utils/backup';
 import { confirmDialog } from '../components/common/ConfirmDialog';
 import { toast } from '../store/toastStore';
 import { applyVolume, setMusic, sfx } from '../utils/sound';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 function Toggle({ on, onChange, label, icon }: { on: boolean; onChange: (v: boolean) => void; label: string; icon: React.ReactNode }) {
   return (
@@ -34,7 +36,7 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
         <label className="text-xs font-bold">Café owner name
           <div className="mt-1 flex gap-2">
             <input className="input" value={name} maxLength={20} onChange={(e) => setName(e.target.value)} />
-            <button className="btn-pink" onClick={() => { rename(name.trim() || 'Yumi'); toast('Name saved ♡', 'success'); }}>Save</button>
+            <button className="btn-pink" onClick={() => { rename(name.trim() || 'Yumi'); toast('Name saved', 'success'); }}>Save</button>
           </div>
         </label>
         <Toggle on={s.soundEnabled} onChange={(v) => { s.set({ soundEnabled: v }); if (v) sfx('pop'); }} label="Sound effects" icon={<Volume2 size={16} />} />
@@ -42,7 +44,15 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
         <label className="flex flex-col gap-1 rounded-2xl bg-white px-3 py-2.5 text-sm font-bold shadow-sm">Volume
           <input type="range" min={0} max={1} step={0.05} value={s.volume} onChange={(e) => { s.set({ volume: +e.target.value }); applyVolume(+e.target.value); }} onPointerUp={() => sfx('pop')} />
         </label>
-        <Toggle on={s.reducedMotion} onChange={(v) => s.set({ reducedMotion: v })} label="Reduce motion" icon={<span>🐢</span>} />
+        <Toggle on={s.reducedMotion} onChange={(v) => s.set({ reducedMotion: v })} label="Reduce motion" icon={<Glyph name="turtle" size={18} />} />
+        <div className="hidden rounded-2xl bg-white px-3 py-2.5 shadow-sm [@media(hover:hover)]:block">
+          <h3 className="mb-1.5 font-display text-sm">Keyboard shortcuts <span className="text-[10px] font-normal text-cocoa">(select a sticker first)</span></h3>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+            {[[`${MOD}+Z / ${MOD}+Shift+Z`, 'Undo / Redo'], ['Arrow keys', 'Nudge 2 px (Shift = 10 px)'], ['[  ]', 'Rotate (Shift = 45°)'], ['-  +', 'Smaller / bigger'], ['F', 'Flip'], [`${MOD}+D`, 'Duplicate'], ['Delete', 'Remove'], ['Esc', 'Deselect']].map(([k, v]) => (
+              <div key={k} className="contents"><dt><kbd className="rounded-md border border-[#E6D7C3] bg-cream px-1.5 py-0.5 font-mono text-[10px] font-bold">{k}</kbd></dt><dd className="text-cocoa">{v}</dd></div>
+            ))}
+          </dl>
+        </div>
         <div className="mt-2 rounded-2xl border-2 border-dashed border-strawberry/60 p-3">
           <h3 className="mb-2 font-display text-sm">Backup & data</h3>
           <p className="mb-3 text-xs text-cocoa">Everything is saved in this browser. Download a backup file to move your café to another device.</p>

@@ -18,7 +18,7 @@ export const defaultCafe = (): CafeLayout => ({
       it('f-curtain', 300, 240, 330),
       it('f-pendant', 640, 95, 110),
       it('f-pendant', 980, 95, 110),
-      it('f-menuboard', 930, 280, 210, { text: 'Today: Cream Soda ♡' }),
+      it('f-menuboard', 930, 280, 210, { text: 'Today: Cream Soda' }),
       it('f-shelf', 640, 260, 240),
       it('f-counter', 780, 600, 520),
       it('f-espresso', 680, 450, 130),
@@ -37,7 +37,7 @@ export const defaultCafe = (): CafeLayout => ({
     signText: 'YUMI CAFÉ',
     items: [
       it('f-flowerpot', 170, 650, 120),
-      it('f-signboard', 1020, 640, 150, { text: 'OPEN ♡' }),
+      it('f-signboard', 1020, 640, 150, { text: 'OPEN' }),
       it('f-planter', 430, 690, 200),
     ],
   },

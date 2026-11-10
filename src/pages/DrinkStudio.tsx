@@ -24,6 +24,7 @@ import type { DragPayload } from '../components/game/dnd';
 import { sfx } from '../utils/sound';
 import { clamp } from '../utils/misc';
 import { useAssets } from '../store/assetStore';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 const STEPS = [
   { id: 'start', label: 'Recipe or Free', jp: 'はじめに' },
@@ -190,14 +191,14 @@ export default function DrinkStudio() {
         return (
           <div className="flex flex-col gap-3">
             <OptionGrid options={ICE_TYPES} value={d.ice} recommended={recHint(target?.ice)} onPick={(o) => { set({ ice: o.id }); if (o.id !== 'none') sfx('ice'); }}
-              render={(o) => <span className="text-2xl">{o.id === 'none' ? '∅' : o.id === 'heart' ? '🤍' : o.id === 'star' ? '⭐' : o.id === 'crushed' ? '🧊' : '🧊'}</span>} />
+              render={(o) => <Glyph name={o.id === 'none' ? 'none' : o.id === 'heart' ? 'heart' : o.id === 'star' ? 'star' : 'ice'} size={30} />} />
             {d.ice !== 'none' && d.ice !== 'crushed' && <Slider label="How many cubes" value={d.iceCount} min={1} max={8} onChange={(v) => set({ iceCount: v })} />}
           </div>
         );
       case 5:
         return (
           <div className="flex flex-col gap-3">
-            <div className="rounded-2xl bg-sky/50 p-3 text-xs font-bold text-[#35617A]">🥄 Draw circles on the glass to stir. Keep some layers for a gradient, or shake it for a perfect blend!</div>
+            <div className="rounded-2xl bg-sky/50 p-3 text-xs font-bold text-[#35617A]"><Glyph name="spoon" className="mr-1" />Draw circles on the glass to stir. Keep some layers for a gradient, or shake it for a perfect blend!</div>
             <div className="h-3 overflow-hidden rounded-full bg-cream"><motion.div className="h-full rounded-full bg-gradient-to-r from-strawberry to-matcha" animate={{ width: `${d.mixed * 100}%` }} /></div>
             <div className="flex gap-2">
               <button className="btn-sky flex-1" onClick={doShake} disabled={!hasLiquid}><Vibrate size={16} />Shake!</button>
@@ -212,7 +213,7 @@ export default function DrinkStudio() {
         return (
           <div className="flex flex-col gap-3">
             <h3 className="text-xs font-bold">Ice cream <span className="font-normal text-cocoa">(tap or drag onto the glass)</span></h3>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="tile-grid">
               <button className={`tile ${!d.iceCream ? 'tile-on' : ''}`} onClick={() => set({ iceCream: null })}>None</button>
               {ICE_CREAMS.map((ic) => {
                 const locked = !isUnlocked(`ice:${ic.id}`);
@@ -220,16 +221,16 @@ export default function DrinkStudio() {
                   <button key={ic.id} disabled={locked} onClick={() => { set({ iceCream: ic.id }); sfx('scoop'); }} className={`tile ${d.iceCream === ic.id ? 'tile-on' : ''} ${locked ? 'tile-locked' : ''}`}>
                     {target?.iceCream === ic.id && <span className="absolute -top-2 rounded-full bg-matcha-deep px-1.5 text-[9px] text-white">レシピ</span>}
                     <svg viewBox="-60 -64 120 100" className="h-9 w-10"><Scoop r={44} color={ic.color!} color2={ic.color2!} /></svg>
-                    <span className="text-[10px]">{ic.name}{locked ? ' 🔒' : ''}</span>
+                    <span className="text-[10px]">{ic.name}{locked && <Glyph name="lock" className="ml-0.5" />}</span>
                   </button>
                 );
               })}
             </div>
-            <button className={`tile flex-row !justify-start gap-3 px-3 ${d.cream ? 'tile-on' : ''}`} onClick={() => { set({ cream: !d.cream }); sfx('pipe'); }}>
-              <span className="text-2xl">🍦</span><span>Whipped cream {target?.cream ? <span className="rounded-full bg-matcha-deep px-1.5 text-[9px] text-white">レシピ</span> : null}</span>
+            <button className={`tile flex-row !justify-start gap-3 min-h-[56px] px-3 ${d.cream ? 'tile-on' : ''}`} onClick={() => { set({ cream: !d.cream }); sfx('pipe'); }}>
+              <Glyph name="cream" size={30} /><span>Whipped cream {target?.cream ? <span className="rounded-full bg-matcha-deep px-1.5 text-[9px] text-white">レシピ</span> : null}</span>
             </button>
             <OptionGrid options={DRINK_TOPPINGS} value={d.toppings} recommended={recHint(target?.toppings)} onPick={(o) => set({ toppings: d.toppings.includes(o.id) ? d.toppings.filter((x) => x !== o.id) : [...d.toppings, o.id] })}
-              render={(o) => <span className="text-xl">{({ strawberries: '🍓', cherry: '🍒', jelly: '🟪', boba: '⚫', marshmallow: '☁️', sprinkles: '✨', minicookie: '🍪' } as Record<string, string>)[o.id]}</span>} />
+              render={(o) => <Glyph name={({ strawberries: 'strawberry', cherry: 'cherry', jelly: 'jelly', boba: 'boba', marshmallow: 'marshmallow', sprinkles: 'sprinkles', minicookie: 'cookie' } as Record<string, GlyphName>)[o.id] || 'sparkle'} size={28} />} />
           </div>
         );
       default:
@@ -239,8 +240,8 @@ export default function DrinkStudio() {
               id: 'drink', label: 'Straw & label', icon: <Sparkles size={14} />, content: (
                 <div className="flex flex-col gap-3">
                   <h3 className="text-xs font-bold">Straw</h3>
-                  <OptionGrid options={STRAWS} value={d.straw} cols="grid-cols-4 lg:grid-cols-4" onPick={(o) => set({ straw: o.id })}
-                    render={(o) => o.id === 'none' ? <span>∅</span> : <svg viewBox="0 0 40 60" className="h-9 w-7"><Straw kind={o.id} a={{ x: 14, y: 56 }} b={{ x: 26, y: 8 }} /></svg>} />
+                  <OptionGrid options={STRAWS} value={d.straw} cols="tile-grid" onPick={(o) => set({ straw: o.id })}
+                    render={(o) => o.id === 'none' ? <Glyph name="none" size={28} /> : <svg viewBox="0 0 40 60" className="h-9 w-7"><Straw kind={o.id} a={{ x: 14, y: 56 }} b={{ x: 26, y: 8 }} /></svg>} />
                   <h3 className="text-xs font-bold">Rim garnish</h3>
                   <div className="flex flex-wrap gap-1.5">{GARNISH.map((g) => <button key={g.id} className={`chip ${d.garnish === g.id ? '!bg-strawberry' : ''}`} onClick={() => set({ garnish: g.id })}>{g.name}</button>)}</div>
                   <h3 className="text-xs font-bold">Glass label</h3>
@@ -270,7 +271,7 @@ export default function DrinkStudio() {
         subtitle={recipe ? `Recipe: ${recipe.name} — ${recipe.jp}` : 'Become a barista and invent your own Japanese café drink.'}
         steps={STEPS} step={step} setStep={setStep} canNext={canNext} nextHint="Choose a base to continue"
         undo={{ undo: h.undo, redo: h.redo, canUndo: h.canUndo, canRedo: h.canRedo }}
-        stageHint={recipe && step > 0 && step < 7 ? <span className="chip max-w-full truncate !bg-matcha/60 !text-matcha-dark">📖 Step {step}: {recipe.steps[Math.min(step - 1, recipe.steps.length - 1)]}</span> : step === 5 ? <span className="chip">🥄 Stir in circles on the glass</span> : null}
+        stageHint={recipe && step > 0 && step < 7 ? <span className="chip max-w-full truncate !bg-matcha/60 !text-matcha-dark"><Glyph name="book" className="mr-1" />Step {step}: {recipe.steps[Math.min(step - 1, recipe.steps.length - 1)]}</span> : step === 5 ? <span className="chip"><Glyph name="spoon" />Stir in circles on the glass</span> : null}
         stageTools={<BgPicker value={st.bg || 'bg-showa'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setResult(true); }}
         stage={
@@ -297,7 +298,7 @@ export default function DrinkStudio() {
         }
         stageFooter={step === 7 ? <ItemToolbar items={d.items} selectedId={st.selectedId} setItems={setItems} onSelect={st.setSelectedId} /> : null}
         panel={panel}
-        finishLabel="Finish drink ✿"
+        finishLabel="Finish drink"
       />
       <ResultModal open={result} onClose={() => setResult(false)} svgRef={st.svgRef} size={{ w: 400, h: 520 }} type="drink"
         defaultName={defaultName} ingredients={ingredients} data={d} editingId={st.editingId} isRecipe={matchesRecipe()} season={season}

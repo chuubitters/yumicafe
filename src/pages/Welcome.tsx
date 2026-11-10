@@ -8,6 +8,7 @@ import { useGame } from '../store/gameStore';
 import { sfx } from '../utils/sound';
 import { FloatingDeco } from '../components/common/Sparkles';
 import { PetalLayer } from '../components/common/PetalLayer';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 export default function Welcome({ onEnter }: { onEnter: () => void }) {
   const layout = useCafe((s) => s.layout);
@@ -30,7 +31,7 @@ export default function Welcome({ onEnter }: { onEnter: () => void }) {
       <FloatingDeco />
       <div className="awning absolute inset-x-0 top-0 z-10" aria-hidden />
       <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="z-10 mb-4 mt-4 text-center">
-        <div className="poster-kicker !tracking-[0.5em]" data-mode="cafe">✦ ようこそ ✦</div>
+        <div className="poster-kicker !tracking-[0.5em]" data-mode="cafe">ようこそ</div>
         <h1 className="poster-title text-[40px] sm:text-7xl" data-mode="cafe" aria-label="YUMI CAFÉ">
           {'YUMI CAFÉ'.split('').map((ch, i) => (
             <motion.span key={i} className="inline-block" initial={{ y: -40, opacity: 0, rotate: -12 }} animate={{ y: 0, opacity: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 380, damping: 11, delay: 0.1 + i * 0.06 }}>{ch === ' ' ? '\u00A0' : ch}</motion.span>
@@ -52,7 +53,7 @@ export default function Welcome({ onEnter }: { onEnter: () => void }) {
 
       <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="paper stitch relative z-10 -mt-8 flex w-full max-w-md flex-col items-center gap-3 p-5 text-center">
         {player ? (
-          <p className="font-bold">おかえりなさい, <span className="text-strawberry-dark">{player.name}</span>! Your café missed you ♡</p>
+          <p className="font-bold">おかえりなさい, <span className="text-strawberry-dark">{player.name}</span>! Your café missed you.</p>
         ) : (
           <label className="w-full text-sm font-bold">What’s the café owner’s name?
             <input className="input mt-2 text-center" placeholder="Yumi" maxLength={20} value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && enter()} ref={(el) => el?.focus({ preventScroll: true })} />

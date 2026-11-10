@@ -22,6 +22,7 @@ import type { AnimalFace, ParfaitData, ParfaitTop, StageItem } from '../types';
 import type { DragPayload } from '../components/game/dnd';
 import { sfx } from '../utils/sound';
 import { clamp, uid } from '../utils/misc';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 const STEPS = [
   { id: 'glass', label: 'Choose glass', jp: 'グラス' },
@@ -35,7 +36,7 @@ const STEPS = [
 const ANIMALS: AnimalFace['type'][] = ['none', 'cat', 'bear', 'bunny', 'panda', 'chick'];
 const FACES: AnimalFace['face'][] = ['happy', 'smile', 'wink', 'sleepy', 'surprised'];
 const ACCS: AnimalFace['acc'][] = ['none', 'bow', 'flower', 'leaf', 'crown'];
-const ANIMAL_EMOJI: Record<string, string> = { none: '∅', cat: '🐱', bear: '🐻', bunny: '🐰', panda: '🐼', chick: '🐥' };
+const ANIMAL_GLYPH: Record<string, GlyphName> = { none: 'none', cat: 'cat', bear: 'bear', bunny: 'bunny', panda: 'panda', chick: 'chick' };
 
 function GlassThumb({ id }: { id: string }) {
   const d = useMemo<ParfaitData>(() => ({ ...emptyParfait(), glass: id, layers: [{ id: 'a', kind: 'jelly-strawberry' }, { id: 'b', kind: 'cream' }, { id: 'c', kind: 'cornflakes' }] }), [id]);
@@ -179,11 +180,11 @@ export default function ParfaitAtelier() {
   const season = d.top.some((t) => t.flavor === 'sakura') ? 'spring' : d.layers.some((l) => l.kind === 'fruit-mango') ? 'summer' : d.top.some((t) => t.flavor === 'hojicha') ? 'autumn' : null;
 
   const scoopTray = (
-    <div className="scroll-x">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2">
       {ICE_CREAMS.map((ic) => {
         const locked = !isUnlocked(`ice:${ic.id}`);
         const prev = <svg viewBox="-60 -70 120 110" className="h-11 w-12"><Scoop r={44} color={ic.color!} color2={ic.color2!} animal={nextAnimal.type !== 'none' ? nextAnimal : undefined} /></svg>;
-        return <TrayTile key={ic.id} payload={{ type: 'icecream', ref: ic.id }} preview={prev} label={ic.name} locked={locked} onAdd={(p) => addScoop(p.ref)} />;
+        return <TrayTile key={ic.id} payload={{ type: 'icecream', ref: ic.id }} preview={prev} label={ic.name} locked={locked} fluid onAdd={(p) => addScoop(p.ref)} />;
       })}
     </div>
   );
@@ -201,7 +202,7 @@ export default function ParfaitAtelier() {
             {groups.map((gname) => (
               <div key={gname}>
                 {step === 3 && <h3 className="mb-1 text-xs font-bold capitalize">{gname === 'base' ? 'Crunch, jelly & fruit' : gname === 'ice' ? 'Ice cream layers' : 'Cream & sauces'}</h3>}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="tile-grid">
                   {PARFAIT_LAYERS.filter((l) => l.group === gname).map((l) => (
                     <TrayTile key={l.id} payload={{ type: 'layer', ref: l.id }} label={l.name} onAdd={(p) => addLayer(p.ref)} size="sm"
                       preview={<span className="block h-7 w-10 rounded-lg border-2 border-white shadow" style={{ background: `linear-gradient(180deg, ${l.color}, ${l.color2 || l.color})` }} />} />
@@ -221,7 +222,7 @@ export default function ParfaitAtelier() {
             {scoopTray}
             <div className="rounded-2xl bg-white/80 p-3 shadow-sm">
               <h3 className="mb-2 flex items-center gap-1 text-xs font-bold"><Sparkles size={14} />Cute animal ice cream</h3>
-              <div className="mb-2 flex flex-wrap gap-1.5">{ANIMALS.map((a) => <button key={a} className={`chip ${nextAnimal.type === a ? '!bg-strawberry' : ''}`} onClick={() => { setNextAnimal({ ...nextAnimal, type: a }); if (selTop?.type === 'scoop') updTop(selTop.id, { animal: a === 'none' ? undefined : { ...(selTop.animal || nextAnimal), type: a } }); }}>{ANIMAL_EMOJI[a]} {a}</button>)}</div>
+              <div className="mb-2 flex flex-wrap gap-1.5">{ANIMALS.map((a) => <button key={a} className={`chip ${nextAnimal.type === a ? '!bg-strawberry' : ''}`} onClick={() => { setNextAnimal({ ...nextAnimal, type: a }); if (selTop?.type === 'scoop') updTop(selTop.id, { animal: a === 'none' ? undefined : { ...(selTop.animal || nextAnimal), type: a } }); }}><Glyph name={ANIMAL_GLYPH[a]} size={22} /> {a}</button>)}</div>
               <div className="mb-2 flex flex-wrap gap-1.5">{FACES.map((f) => <button key={f} className={`chip ${nextAnimal.face === f ? '!bg-butter' : ''}`} onClick={() => { setNextAnimal({ ...nextAnimal, face: f }); if (selTop?.animal) updTop(selTop.id, { animal: { ...selTop.animal, face: f } }); }}>{f}</button>)}</div>
               <div className="flex flex-wrap gap-1.5">{ACCS.map((a) => <button key={a} className={`chip ${nextAnimal.acc === a ? '!bg-matcha' : ''}`} onClick={() => { setNextAnimal({ ...nextAnimal, acc: a }); if (selTop?.animal) updTop(selTop.id, { animal: { ...selTop.animal, acc: a } }); }}>{a === 'none' ? 'no accessory' : a}</button>)}</div>
             </div>
@@ -238,8 +239,8 @@ export default function ParfaitAtelier() {
       case 4:
         return (
           <div className="flex flex-col gap-3">
-            <div className="rounded-2xl bg-sky/50 p-3 text-xs font-bold text-[#35617A]">🧁 Press and hold on top of the parfait to pipe cream — hold longer for a bigger swirl. Drag while holding to aim.</div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="rounded-2xl bg-sky/50 p-3 text-xs font-bold text-[#35617A]"><Glyph name="cupcake" className="mr-1" />Press and hold on top of the parfait to pipe cream — hold longer for a bigger swirl. Drag while holding to aim.</div>
+            <div className="tile-grid">
               {CREAM_COLORS.map((c) => (
                 <button key={c.id} className={`tile ${creamFlavor === c.id ? 'tile-on' : ''}`} onClick={() => setCreamFlavor(c.id)}>
                   <svg viewBox="-50 -60 100 70" className="h-9 w-11"><WhippedCream w={70} color={c.color} color2={c.color2} /></svg>
@@ -255,7 +256,7 @@ export default function ParfaitAtelier() {
         return (
           <div className="flex flex-col gap-3">
             <p className="text-[11px] text-cocoa">Tap or drag toppings onto your parfait. Move, resize, rotate or delete them with the handles.</p>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="tile-grid">
               {TOPPING_SPRITES.map((s) => <TrayTile key={s} size="sm" payload={{ type: 'sprite', ref: s }} preview={<SpriteThumb id={s} size={36} />} label={SPRITES[s].name} onAdd={addItem} />)}
             </div>
             <h3 className="text-xs font-bold">Sauce drizzle</h3>
@@ -265,7 +266,7 @@ export default function ParfaitAtelier() {
       default:
         return <DecorPanel onAdd={addItem} items={d.items} selectedId={st.selectedId} onSelect={st.setSelectedId}
           extraTabs={[{ id: 'fruit', label: 'Toppings', icon: <CherryIcon size={14} />, content: (
-            <div className="grid grid-cols-4 gap-2">{TOPPING_SPRITES.map((s) => <TrayTile key={s} size="sm" payload={{ type: 'sprite', ref: s }} preview={<SpriteThumb id={s} size={36} />} label={SPRITES[s].name} onAdd={addItem} />)}</div>
+            <div className="tile-grid">{TOPPING_SPRITES.map((s) => <TrayTile key={s} size="sm" payload={{ type: 'sprite', ref: s }} preview={<SpriteThumb id={s} size={36} />} label={SPRITES[s].name} onAdd={addItem} />)}</div>
           ) }]} />;
     }
   })();
@@ -278,10 +279,10 @@ export default function ParfaitAtelier() {
         steps={STEPS} step={step} setStep={setStep}
         canNext={step === 1 ? d.layers.length > 0 : true} nextHint="Add a base layer first"
         undo={{ undo: h.undo, redo: h.redo, canUndo: h.canUndo, canRedo: h.canRedo }}
-        stageHint={step === 4 ? <span className="chip">🧁 Press & hold to pipe</span> : step === 2 ? <span className="chip">🍨 Drag scoops onto the glass</span> : null}
+        stageHint={step === 4 ? <span className="chip"><Glyph name="cream" />Press & hold to pipe</span> : step === 2 ? <span className="chip"><Glyph name="icecream" />Drag scoops onto the glass</span> : null}
         stageTools={<BgPicker value={st.bg || 'bg-fukuda'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setTopSel(null); setResult(true); }}
-        finishLabel="Finish parfait ✿"
+        finishLabel="Finish parfait"
         stage={
           <Stage ref={st.svgRef} width={400} height={520} bgClassName={st.bg || 'bg-fukuda'} maxHeight="var(--stage-max-h)"
             onDrop={onDrop} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} cursor={step === 4 ? 'crosshair' : undefined} ariaLabel="Your parfait">

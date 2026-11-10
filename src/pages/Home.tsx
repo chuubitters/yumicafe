@@ -19,6 +19,7 @@ import { SEASONS } from '../data/catalog';
 import type { StageItem } from '../types';
 import { FloatingDeco } from '../components/common/Sparkles';
 import { sfx } from '../utils/sound';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 export const cafeItemRender = (theme: string) => (it: StageItem) =>
   it.ref === 'f-window' ? <ItemContent it={{ ...it, text: theme }} /> : <ItemContent it={it} />;
@@ -167,7 +168,7 @@ export default function Home() {
           <h2 className="mb-2 flex items-center gap-2 font-display text-lg text-kiss-red"><Wand2 size={18} className="anim-wiggle text-strawberry-deep" />Daily inspiration</h2>
           <div className="ribbon mb-2">{idea.jp}</div>
           <p className="mb-3 text-sm">{idea.t}</p>
-          <Link to={idea.to} className="btn-pink btn-sm">Let’s make it ♡</Link>
+          <Link to={idea.to} className="btn-pink btn-sm">Let’s make it<Glyph name="heart" className="ml-1" /></Link>
           <Star className="anim-bob pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 rotate-12 fill-butter text-butter opacity-70" />
         </div>
       </section>

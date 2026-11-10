@@ -17,6 +17,7 @@ import { downloadBlob, formatDate, safeName } from '../utils/misc';
 import { sfx } from '../utils/sound';
 import type { Creation } from '../types';
 import { ModeFrame, TitleBlock, Stamp } from '../components/common/PosterTitle';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 const CATS = [
   { id: 'all', label: 'All', jp: 'すべて' },
@@ -91,11 +92,11 @@ export default function MyCollection() {
       {/* album cover */}
       <section className="paper relative flex flex-col items-center gap-4 overflow-hidden p-4 sm:flex-row sm:p-5" style={{ background: 'linear-gradient(135deg,#FBE3EA 0%,#FFF8ED 60%,#EEF3E6 100%)' }}>
         <div className="relative h-32 w-28 shrink-0 rotate-[-4deg] overflow-hidden rounded-xl border-[6px] border-white bg-strawberry shadow-card">
-          {coverUrl ? <img src={coverUrl} alt="Album cover" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-4xl">📒</div>}
+          {coverUrl ? <img src={coverUrl} alt="Album cover" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Glyph name="notebook" size="55%" /></div>}
           <span className="absolute -top-1 left-6 h-4 w-14 rotate-[-8deg] bg-butter/80" />
         </div>
         <div className="flex-1 text-center sm:text-left">
-          <div className="poster-kicker">✦ コレクションブック ✦</div>
+          <div className="poster-kicker">コレクションブック</div>
           <h1 className="poster-title text-2xl sm:text-3xl">{player?.name || 'Yumi'}’s Sweet Collection</h1>
           <p className="text-sm text-cocoa">{creations.length} creations · {creations.filter((c) => c.isFavorite).length} favorites</p>
         </div>
@@ -133,7 +134,7 @@ export default function MyCollection() {
                 className="paper card-hover relative flex cursor-pointer flex-col p-2.5 pb-3" style={{ rotate: `${((i % 5) - 2) * 0.7}deg` }} onClick={() => setOpen(c)}>
                 <span className="absolute -top-2 left-1/2 z-10 h-5 w-16 -translate-x-1/2 rotate-[-3deg] opacity-80" style={{ background: TAPE[i % TAPE.length] }} />
                 <div className={`grid aspect-square place-items-center overflow-hidden rounded-2xl ${c.type === 'cafe' ? 'bg-sky' : 'bg-strawberry-drip'}`}>
-                  {previews[c.id] ? <img src={previews[c.id]} alt={c.name} className={c.type === 'cafe' ? 'h-full w-full object-cover' : 'max-h-[92%] max-w-[92%] object-contain drop-shadow'} loading="lazy" /> : <span className="text-3xl">🍰</span>}
+                  {previews[c.id] ? <img src={previews[c.id]} alt={c.name} className={c.type === 'cafe' ? 'h-full w-full object-cover' : 'max-h-[92%] max-w-[92%] object-contain drop-shadow'} loading="lazy" /> : <Glyph name="cake" size={44} />}
                 </div>
                 <div className="mt-2 flex items-start gap-1">
                   <div className="min-w-0 flex-1">
@@ -168,9 +169,9 @@ export default function MyCollection() {
                 <button className={current.isFavorite ? 'btn-pink' : 'btn-cream'} onClick={() => toggleFav(current.id)}><Heart size={16} className={current.isFavorite ? 'fill-current' : ''} />{current.isFavorite ? 'Favorited' : 'Favorite'}</button>
                 <button className="btn-butter" onClick={() => exportCard(current)}><Download size={16} />Export card</button>
                 <button className="btn-cream" onClick={async () => { const b = await (await fetch(previews[current.id])).blob(); downloadBlob(b, `${safeName(current.name)}.png`); sfx('shutter'); }}><Download size={16} />PNG</button>
-                {current.type !== 'cafe' && <button className="btn-matcha" onClick={() => { useCafe.getState().addDisplay(current.id, current.previewW, current.previewH); toast('Displayed in your café ✿', 'success'); nav('/cafe'); }}><Store size={16} />Display in café</button>}
+                {current.type !== 'cafe' && <button className="btn-matcha" onClick={() => { useCafe.getState().addDisplay(current.id, current.previewW, current.previewH); toast('Displayed in your café', 'success'); nav('/cafe'); }}><Store size={16} />Display in café</button>}
                 <button className="btn-sky" onClick={() => nav(`/photo?creation=${current.id}`)}><Camera size={16} />Photo Studio</button>
-                <button className="btn-cream" onClick={async () => { const c = await duplicate(current.id); if (c) { toast('Duplicated ✿', 'success'); setOpen(c); } }}><Copy size={16} />Duplicate</button>
+                <button className="btn-cream" onClick={async () => { const c = await duplicate(current.id); if (c) { toast('Duplicated', 'success'); setOpen(c); } }}><Copy size={16} />Duplicate</button>
                 <button className="btn-cream !text-strawberry-dark" onClick={async () => {
                   if (await confirmDialog('Delete creation?', `“${current.name}” will be removed from your collection.`, 'Delete')) {
                     await remove(current.id);

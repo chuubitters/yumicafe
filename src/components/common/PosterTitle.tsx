@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
+import { Glyph, type GlyphName } from './Glyph';
 
 export type ModeId = 'drink' | 'parfait' | 'crepe' | 'cookie' | 'cafe' | 'photo' | 'shop' | 'collection';
 
@@ -10,9 +11,9 @@ const BADGE: Record<ModeId, [string, string]> = {
   crepe: ['人気', 'No.1'],
   cookie: ['焼きたて', 'ほかほか'],
   cafe: ['営業中', 'OPEN'],
-  photo: ['映え', '♡'],
+  photo: ['映え', 'SNS'],
   shop: ['おまけ', 'つき'],
-  collection: ['宝物', '♡'],
+  collection: ['宝物', 'たから'],
 };
 
 /** Wraps a page so it picks up the per-mode palette and the tinted poster band behind the header. */
@@ -39,7 +40,7 @@ export function TitleBlock({ title, jp, subtitle, small }: { title: string; jp: 
   return (
     <>
       <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} className="poster-kicker flex items-center gap-2">
-        <span className="anim-twinkle">✦</span>{jp}<span className="anim-twinkle" style={{ animationDelay: '.6s' }}>✦</span>
+        <Glyph name="sparkle" size={12} className="anim-twinkle" />{jp}<Glyph name="sparkle" size={12} className="anim-twinkle" style={{ animationDelay: '.6s' }} />
       </motion.div>
       <motion.h1 initial={{ opacity: 0, y: 14, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }}
         className={`poster-title ${small ? 'text-2xl sm:text-3xl md:text-4xl' : 'text-[28px] sm:text-4xl md:text-[44px]'}`}>

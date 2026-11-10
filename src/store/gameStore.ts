@@ -56,12 +56,12 @@ export const useGame = create<GameState>()(
       earn: (n, reason) => {
         const before = levelFor(get().totalEarned);
         set({ stars: get().stars + n, totalEarned: get().totalEarned + n });
-        if (reason) toast(`+${n} ★  ${reason}`, 'star');
+        if (reason) toast(`+${n} stars · ${reason}`, 'star');
         const after = levelFor(get().totalEarned);
         if (after > before) {
           setTimeout(() => {
             sfx('levelup');
-            toast(`Café level up! You're now level ${after} ✿`, 'success');
+            toast(`Café level up! You're now level ${after}`, 'success');
           }, 500);
         }
       },

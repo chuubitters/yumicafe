@@ -1,4 +1,6 @@
-import { useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { uid } from '../../utils/misc';
+import { sfx } from '../../utils/sound';
 import type { StageItem } from '../../types';
 import { SPRITES } from '../../art/sprites';
 import { useAssets } from '../../store/assetStore';
@@ -163,6 +165,41 @@ export function ItemsLayer({ items, selectedId, onSelect, onLive, onCommit, onDe
     window.addEventListener('pointercancel', up);
   };
 
+
+  /* Keyboard control for the selected item (PC / Mac): arrows nudge (Shift = 10px), Delete removes,
+     [ ] rotate, - = scale, F flips, Ctrl/Cmd+D duplicates, Esc deselects. Ignored while typing in a field. */
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
+  useEffect(() => {
+    if (!interactive || !selectedId) return;
+    const k = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      const cur = itemsRef.current.find((x) => x.id === selectedId);
+      if (!cur) return;
+      const mod = e.ctrlKey || e.metaKey;
+      const step = e.shiftKey ? 10 : 2;
+      const apply = (p: Partial<StageItem>) => { onLive(itemsRef.current.map((x) => (x.id === cur.id ? { ...x, ...p } : x))); onCommit(); };
+      const arrows: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+      if (arrows[e.key] && !mod) { e.preventDefault(); apply({ x: cur.x + arrows[e.key][0], y: cur.y + arrows[e.key][1] }); sfx('tick', 0.4); return; }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !mod) { e.preventDefault(); sfx('delete'); if (onDelete) onDelete(cur.id); return; }
+      if (e.key === 'Escape') { onSelectRef.current(null); return; }
+      if (mod && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        const c = { ...cur, id: uid('it'), x: cur.x + 18, y: cur.y + 18 };
+        onLive([...itemsRef.current, c]); onCommit(); onSelectRef.current(c.id); sfx('pop'); return;
+      }
+      if (mod) return;
+      if (e.key === '[') { e.preventDefault(); apply({ rotation: cur.rotation - (e.shiftKey ? 45 : 15) }); sfx('tick', 0.3); }
+      else if (e.key === ']') { e.preventDefault(); apply({ rotation: cur.rotation + (e.shiftKey ? 45 : 15) }); sfx('tick', 0.7); }
+      else if (e.key === '=' || e.key === '+') { e.preventDefault(); apply({ w: cur.w * 1.1, h: cur.h * 1.1 }); sfx('tick', 0.8); }
+      else if (e.key === '-' || e.key === '_') { e.preventDefault(); apply({ w: Math.max(minSize, cur.w / 1.1), h: Math.max(minSize, cur.h / 1.1) }); sfx('tick', 0.2); }
+      else if (e.key.toLowerCase() === 'f') { e.preventDefault(); apply({ flipX: !cur.flipX }); sfx('pop'); }
+    };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [interactive, selectedId, onLive, onCommit, onDelete, minSize]);
+
   const hr = 13 * uiScale;
   return (
     <g>
@@ -172,17 +209,6 @@ export function ItemsLayer({ items, selectedId, onSelect, onLive, onCommit, onDe
           <g key={it.id} data-item={it.id} transform={`translate(${it.x} ${it.y}) rotate(${it.rotation})`} opacity={it.opacity ?? 1}
             style={{ cursor: interactive && !it.locked ? 'grab' : undefined }}
             onPointerDown={(e) => start(e, 'move', it)}
-            onKeyDown={(e) => {
-              if (!sel) return;
-              const step = e.shiftKey ? 10 : 2;
-              const map: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
-              if (map[e.key]) {
-                e.preventDefault();
-                onLive(items.map((x) => (x.id === it.id ? { ...x, x: x.x + map[e.key][0], y: x.y + map[e.key][1] } : x)));
-                onCommit();
-              }
-              if ((e.key === 'Delete' || e.key === 'Backspace') && onDelete) onDelete(it.id);
-            }}
             tabIndex={interactive ? 0 : undefined}
             role={interactive ? 'button' : undefined}
             aria-label={interactive ? `${it.kind} ${it.ref}` : undefined}

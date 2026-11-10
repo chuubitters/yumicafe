@@ -21,6 +21,7 @@ import type { CookieData, IcingStroke, StageItem } from '../types';
 import type { DragPayload } from '../components/game/dnd';
 import { sfx } from '../utils/sound';
 import { clamp, uid } from '../utils/misc';
+import { Glyph, type GlyphName } from '../components/common/Glyph';
 
 const STEPS = [
   { id: 'dough', label: 'Choose dough', jp: '生地' },
@@ -217,21 +218,21 @@ export default function CookieBakery() {
   const panel = (() => {
     switch (step) {
       case 0:
-        return <OptionGrid options={DOUGHS} value={d.dough} cols="grid-cols-3" onPick={(o) => { set({ dough: o.id }); }} render={(o) => <Swatch c={o.color!} size={38} />} />;
+        return <OptionGrid options={DOUGHS} value={d.dough} cols="tile-grid" onPick={(o) => { set({ dough: o.id }); }} render={(o) => <Swatch c={o.color!} size={38} />} />;
       case 1:
         return (
           <div className="flex flex-col gap-3">
             <p className="text-[11px] text-cocoa">Add ingredients to the bowl, then stir in circles until the dough comes together.</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="tile-grid">
               {DOUGH_INGREDIENTS.map((i) => (
                 <button key={i.id} disabled={d.added.includes(i.id)} className={`tile ${d.added.includes(i.id) ? 'tile-on' : ''}`} onClick={() => { set({ added: [...d.added, i.id] }); sfx('drop'); }}>
-                  <span className="text-2xl">{{ flour: '🌾', butter: '🧈', sugar: '🍚', egg: '🥚', flavor: d.dough === 'chocolate' ? '🍫' : d.dough === 'matcha' ? '🍵' : d.dough === 'strawberry' ? '🍓' : d.dough === 'blueberry' ? '🫐' : '🌼' }[i.id]}</span>
+                  <Glyph name={({ flour: 'wheat', butter: 'butter', sugar: 'sugar', egg: 'egg', flavor: d.dough === 'chocolate' ? 'chocolate' : d.dough === 'matcha' ? 'matcha' : d.dough === 'strawberry' ? 'strawberry' : d.dough === 'blueberry' ? 'blueberry' : 'daisy' } as Record<string, GlyphName>)[i.id] || 'sparkle'} size={30} />
                   {i.id === 'flavor' ? `${dd.name}` : i.name}
                 </button>
               ))}
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-cream"><motion.div className="h-full rounded-full bg-gradient-to-r from-butter to-cocoa-light" animate={{ width: `${d.mix * 100}%` }} /></div>
-            <button className="btn-butter" disabled={d.added.length < 3} onClick={() => { set({ mix: Math.min(1, d.mix + 0.34) }); sfx('stir'); }}>🥄 Stir (or draw circles)</button>
+            <button className="btn-butter" disabled={d.added.length < 3} onClick={() => { set({ mix: Math.min(1, d.mix + 0.34) }); sfx('stir'); }}><Glyph name="spoon" />Stir (or draw circles)</button>
           </div>
         );
       case 2:
@@ -249,7 +250,7 @@ export default function CookieBakery() {
         return (
           <div className="flex flex-col gap-3">
             <p className="text-[11px] text-cocoa">Drag a cutter onto the dough (or tap). Move, resize and rotate your cut-outs. Up to 12 cookies.</p>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="tile-grid">
               {CUTTERS.map((c) => {
                 const locked = !isUnlocked(`cutter:${c.id}`);
                 return <TrayTile key={c.id} size="sm" payload={{ type: 'cutter', ref: c.id }} label={c.name} locked={locked} preview={<CutterThumb shape={c.id} letter={letter} />} onAdd={(p) => addCookie(p.ref)} />;
@@ -272,7 +273,7 @@ export default function CookieBakery() {
             <p className="text-xs text-cocoa">Into the oven! Watch them puff up and turn golden.</p>
             <div className="h-3 overflow-hidden rounded-full bg-cream"><motion.div className="h-full rounded-full bg-gradient-to-r from-butter to-[#D99A4C]" animate={{ width: `${d.bake * 100}%` }} /></div>
             <button className="btn-deep" disabled={baking || d.bake >= 1} onClick={() => setBaking(true)}><Flame size={16} />{baking ? 'Baking…' : d.bake >= 1 ? 'Baked!' : 'Bake'}</button>
-            {d.bake >= 1 && <button className="btn-matcha" onClick={() => { sfx('oven'); setStep(5); }}>Take them out ✿</button>}
+            {d.bake >= 1 && <button className="btn-matcha" onClick={() => { sfx('oven'); setStep(5); }}>Take them out</button>}
           </div>
         );
       case 5:
@@ -281,7 +282,7 @@ export default function CookieBakery() {
             extraTabs={[{
               id: 'icing', label: 'Icing', icon: <Brush size={14} />, content: (
                 <div className="flex flex-col gap-3">
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="tile-grid">
                     <button className={`tile ${tool === 'pipe' ? 'tile-on' : ''}`} onClick={() => setTool('pipe')}><Brush size={20} />Pipe</button>
                     <button className={`tile ${tool === 'flood' ? 'tile-on' : ''}`} onClick={() => setTool('flood')}><PaintBucket size={20} />Flood</button>
                     <button className={`tile ${tool === 'select' ? 'tile-on' : ''}`} onClick={() => setTool('select')}><MousePointer2 size={20} />Move stickers</button>
@@ -299,8 +300,8 @@ export default function CookieBakery() {
       default:
         return (
           <div className="flex flex-col gap-3">
-            <OptionGrid options={PACKS} value={d.pack.type} cols="grid-cols-4" onPick={(o) => { set({ pack: { ...d.pack, type: o.id as CookieData['pack']['type'] } }); sfx('pop'); }}
-              render={(o) => <span className="text-xl">{{ plate: '🍽️', box: '🎁', bag: '🛍️', tin: '🥫' }[o.id]}</span>} />
+            <OptionGrid options={PACKS} value={d.pack.type} cols="tile-grid" onPick={(o) => { set({ pack: { ...d.pack, type: o.id as CookieData['pack']['type'] } }); sfx('pop'); }}
+              render={(o) => <Glyph name={({ plate: 'plate', box: 'gift', bag: 'bag', tin: 'tin' } as Record<string, GlyphName>)[o.id] || 'gift'} size={30} />} />
             <h3 className="text-xs font-bold">Package color</h3>
             <div className="flex flex-wrap gap-1.5">{PACK_COLORS.map((c) => <button key={c} aria-label={`Package ${c}`} onClick={() => set({ pack: { ...d.pack, color: c } })} className={`h-8 w-8 rounded-full border-2 shadow ${d.pack.color === c ? 'scale-110 border-cocoa-dark' : 'border-white'}`} style={{ background: c }} />)}</div>
             <h3 className="text-xs font-bold">Ribbon</h3>
@@ -324,10 +325,10 @@ export default function CookieBakery() {
         subtitle="Mix, knead, cut, bake — then pipe royal icing like a pro."
         steps={STEPS} step={step} setStep={setStep} canNext={canNext} nextHint={nextHint}
         undo={{ undo: h.undo, redo: h.redo, canUndo: h.canUndo, canRedo: h.canRedo }}
-        stageHint={step === 5 ? <span className="chip">{tool === 'pipe' ? '🖌️ Draw icing on a cookie' : tool === 'flood' ? '🪣 Tap a cookie to flood it' : '👆 Move stickers'}</span> : step === 1 || step === 2 ? <span className="chip">{nextHint || 'Ready! ✓'}</span> : null}
+        stageHint={step === 5 ? <span className="chip">{tool === 'pipe' ? 'Draw icing on a cookie' : tool === 'flood' ? 'Tap a cookie to flood it' : 'Drag stickers to move them'}</span> : step === 1 || step === 2 ? <span className="chip">{nextHint || 'Ready'}</span> : null}
         stageTools={<BgPicker value={st.bg || 'bg-pudding'} onChange={st.setBg} />}
         onFinish={() => { st.setSelectedId(null); setResult(true); }}
-        finishLabel="Finish cookies ✿"
+        finishLabel="Finish cookies"
         stage={
           <Stage ref={st.svgRef} width={500} height={500} bgClassName={st.bg || 'bg-pudding'} maxHeight="var(--stage-max-h)"
             onDrop={onDrop} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} cursor={step === 5 && tool !== 'select' ? 'crosshair' : undefined} ariaLabel="Your cookies">

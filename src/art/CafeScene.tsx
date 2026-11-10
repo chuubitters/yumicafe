@@ -155,7 +155,7 @@ function Exterior({ layout }: { layout: CafeLayout }) {
           {creations.slice(wi * 2, wi * 2 + 2).map((c, k) => previews[c.id] && (
             <image key={c.id} href={previews[c.id]} x={x + 20 + k * 82} y={410} width="78" height="92" preserveAspectRatio="xMidYMax meet" />
           ))}
-          {creations.length === 0 && <text x={x + 100} y="470" textAnchor="middle" fontSize="14" fill="#C7AE98" fontFamily="Mali">♡ your sweets ♡</text>}
+          {creations.length === 0 && <text x={x + 100} y="470" textAnchor="middle" fontSize="14" fill="#C7AE98" fontFamily="Mali">your sweets</text>}
           <rect x={x + 10} y="380" width="180" height="180" rx="6" fill="url(#yc-glass-body)" />
           <path d={`M${x + 30} 390 L${x + 90} 550`} stroke="#fff" strokeOpacity=".35" strokeWidth="16" />
           <rect x={x - 8} y="570" width="216" height="14" rx="4" fill="url(#yc-wood)" />
